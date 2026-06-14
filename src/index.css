@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+/* Class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Typography */
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Ocean blues */
+  --color-ocean-50:  #e8f0f8;
+  --color-ocean-100: #b8cfe8;
+  --color-ocean-200: #88aed8;
+  --color-ocean-300: #588dc8;
+  --color-ocean-400: #2b6ca8;
+  --color-ocean-500: #1A3A5C;
+  --color-ocean-600: #152f4a;
+  --color-ocean-700: #102438;
+  --color-ocean-800: #0a1926;
+  --color-ocean-900: #0D1B2A;
+
+  /* Sand */
+  --color-sand-50:  #fdf8f0;
+  --color-sand-100: #F5E6C8;
+  --color-sand-200: #ebd5a8;
+  --color-sand-300: #dfc088;
+  --color-sand-400: #d4a96a;
+  --color-sand-500: #c9924c;
+
+  /* Gold */
+  --color-gold:     #C9A84C;
+  --color-gold-50:  #fdf8e8;
+  --color-gold-100: #f9edbc;
+  --color-gold-200: #f3d97c;
+  --color-gold-300: #ecc84e;
+  --color-gold-400: #d4a846;
+  --color-gold-500: #C9A84C;
+  --color-gold-600: #a88530;
+  --color-gold-700: #7a6020;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-body);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+
+  ::selection {
+    background: #C9A84C33;
+    color: #1A3A5C;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar        { width: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #C9A84C; border-radius: 10px; }
+
+/* Image lazy load fade */
+img { transition: opacity 0.4s ease; }
+
+/* Remove default input date icon in some browsers */
+input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
