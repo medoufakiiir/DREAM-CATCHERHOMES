@@ -123,7 +123,6 @@ export default function Home() {
               { label: tr.home.stats_rating, bold: true },
               { label: tr.home.stats_reviews },
               { label: tr.home.stats_beach, icon: <Waves size={13} /> },
-              { label: tr.home.stats_price, bold: true },
               { label: tr.home.stats_choice, icon: <Award size={13} /> },
             ].map(({ label, bold, icon }, i) => (
               <div key={i} className="flex items-center gap-1.5">
@@ -151,9 +150,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {[
-              { photo: photos[1], name: tr.villas.v1_name, badge: tr.villas.v1_badge, price: 'MAD 1,584', slug: 'Two-Bedroom', delay: 0 },
-              { photo: photos[7], name: tr.villas.v2_name, badge: tr.villas.v2_badge, price: 'MAD 11,590', slug: 'Deluxe', delay: 0.1 },
-            ].map(({ photo, name, badge, price, delay }) => (
+              { photo: photos[1], name: tr.villas.v1_name, badge: tr.villas.v1_badge, slug: 'Two-Bedroom', delay: 0 },
+              { photo: photos[7], name: tr.villas.v2_name, badge: tr.villas.v2_badge, slug: 'Deluxe', delay: 0.1 },
+            ].map(({ photo, name, badge, delay }) => (
               <Reveal key={name} delay={delay}>
                 <Link to="/villas" className="group block cursor-pointer">
                   <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
@@ -180,10 +179,6 @@ export default function Home() {
                           <span>120 {tr.villas.sqm}</span>
                           <span>·</span>
                           <span>{tr.villas.pool}</span>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-body text-xs text-white/60">{tr.villas.from}</p>
-                          <p className="font-heading text-lg font-bold text-gold">{price}</p>
                         </div>
                       </div>
                     </div>

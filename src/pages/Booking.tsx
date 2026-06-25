@@ -107,8 +107,8 @@ export default function Booking() {
                   <label className={labelCls}>Which villa?</label>
                   <select name="villa" value={form.villa} onChange={change} className={fieldCls}>
                     <option value="">Select a villa…</option>
-                    <option>Two-Bedroom Villa — from MAD 1,584 / 2 nights</option>
-                    <option>Deluxe Villa — from MAD 11,590 / 2 nights</option>
+                    <option>Two-Bedroom Villa</option>
+                    <option>Deluxe Villa</option>
                   </select>
                 </div>
 

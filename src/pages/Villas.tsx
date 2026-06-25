@@ -27,12 +27,10 @@ interface VillaProps {
   desc: string
   beds: { label: string }[]
   photos: string[]
-  origPrice: string
-  price: string
   delay: number
 }
 
-function VillaCard({ name, badge, badgeColor, desc, beds, photos: vPhotos, origPrice, price, delay }: VillaProps) {
+function VillaCard({ name, badge, badgeColor, desc, beds, photos: vPhotos, delay }: VillaProps) {
   const { tr, dark } = useApp()
   const features = [tr.villas.pool, tr.villas.sea_view, tr.villas.kitchen, tr.villas.balcony, tr.villas.wifi]
 
@@ -127,12 +125,6 @@ function VillaCard({ name, badge, badgeColor, desc, beds, photos: vPhotos, origP
             {/* Right: pricing widget */}
             <div>
               <div className={cn('rounded-2xl p-6 sticky top-24', dark ? 'bg-ocean-700' : 'bg-sand-50')}>
-                <div className="mb-5">
-                  <p className={`font-body text-xs mb-1 ${dark ? 'text-sand-400' : 'text-ocean-300'}`}>{tr.villas.orig_price} <span className="line-through">{origPrice}</span></p>
-                  <p className="font-heading text-3xl font-bold text-gold">{price}</p>
-                  <p className={`font-body text-xs mt-0.5 ${dark ? 'text-sand-400' : 'text-ocean-300'}`}>{tr.villas.per_2nights}</p>
-                  <p className={`font-body text-xs ${dark ? 'text-sand-400' : 'text-ocean-300'}`}>{tr.villas.taxes}</p>
-                </div>
 
                 <div className={cn('space-y-2 text-xs font-body mb-6 pb-5 border-b', dark ? 'text-sand-300 border-white/10' : 'text-ocean-400 border-sand-200')}>
                   {[
@@ -203,8 +195,6 @@ export default function Villas() {
             desc={tr.villas.v1_desc}
             beds={[{ label: tr.villas.v1_bed1 }, { label: tr.villas.v1_bed2 }, { label: tr.villas.v1_living }]}
             photos={[photos[1], photos[5], photos[9]]}
-            origPrice="MAD 1,760"
-            price="MAD 1,584"
             delay={0}
           />
           <VillaCard
@@ -214,8 +204,6 @@ export default function Villas() {
             desc={tr.villas.v2_desc}
             beds={[{ label: tr.villas.v2_bed1 }, { label: tr.villas.v2_bed2 }]}
             photos={[photos[7], photos[12], photos[17]]}
-            origPrice="MAD 12,878"
-            price="MAD 11,590"
             delay={0.1}
           />
         </div>
