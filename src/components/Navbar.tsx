@@ -50,7 +50,7 @@ export default function Navbar() {
             <img
               src="/logo.png"
               alt="DreamCatcher Homes"
-              className={cn('h-14 w-auto object-contain transition-all duration-300', transparent && 'brightness-0 invert')}
+              className={cn('h-16 w-auto object-contain transition-all duration-300', transparent && 'brightness-0 invert')}
             />
             <div className="hidden sm:block leading-tight">
               <p className={cn('font-heading text-base font-semibold tracking-tight', transparent ? 'text-white' : dark ? 'text-sand-100' : 'text-ocean-500')}>
