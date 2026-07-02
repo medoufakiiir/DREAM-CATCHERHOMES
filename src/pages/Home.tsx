@@ -62,8 +62,12 @@ export default function Home() {
 
           <Reveal delay={0.15} y={48}>
             <h1 className="font-heading font-bold leading-none tracking-tight">
-              <span className="block text-xl sm:text-2xl italic text-gold/90 mb-2 font-normal">{tr.home.headline_1}</span>
-              <span className="block text-7xl sm:text-8xl md:text-9xl lg:text-[10rem]">{tr.home.headline_2}</span>
+              <span className="block text-xl sm:text-2xl italic text-gold/90 mb-4 font-normal">{tr.home.headline_1}</span>
+              <img
+                src="/logo.png"
+                alt="DreamCatcher Homes"
+                className="mx-auto h-40 sm:h-52 md:h-64 lg:h-72 w-auto object-contain brightness-0 invert"
+              />
             </h1>
           </Reveal>
 
