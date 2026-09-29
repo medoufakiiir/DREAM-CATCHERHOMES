@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { Clock, Utensils, Leaf, Sun } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import Seo from '@/components/Seo'
 import { cn } from '@/lib/utils'
 
 const photos = Array.from({ length: 42 }, (_, i) => `/photo${String(i + 1).padStart(2, '0')}.jpg`)
@@ -60,6 +61,7 @@ export default function Dining() {
 
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
+      <Seo title={tr.dining.page_title} description={tr.dining.page_sub} />
       {/* Hero */}
       <div className="relative h-72 sm:h-96 overflow-hidden">
         <img src={photos[13]} alt="Dining at DreamCatcher Homes" className="w-full h-full object-cover" />

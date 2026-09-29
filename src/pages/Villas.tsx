@@ -1,53 +1,52 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'motion/react'
-import { Bed, Bath, Users, Check, Star, Waves, Wifi, Car, ChevronRight } from 'lucide-react'
+import { Bed, Bath, Users, Check, Star, Waves, Wifi, Car, ChevronRight, Images } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import Reveal from '@/components/ui/Reveal'
+import Lightbox from '@/components/ui/Lightbox'
+import Seo from '@/components/Seo'
+import { photos, VILLAS, VillaId, waLink } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
-const photos = Array.from({ length: 42 }, (_, i) => `/photo${String(i + 1).padStart(2, '0')}.jpg`)
-
-function Reveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 36 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.75, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  )
-}
-
 interface VillaProps {
+  id: VillaId
   name: string
   badge: string
   badgeColor: string
   desc: string
   beds: { label: string }[]
-  photos: string[]
   delay: number
 }
 
-function VillaCard({ name, badge, badgeColor, desc, beds, photos: vPhotos, delay }: VillaProps) {
-  const { tr, dark } = useApp()
-  const features = [tr.villas.pool, tr.villas.sea_view, tr.villas.kitchen, tr.villas.balcony, tr.villas.wifi]
+function VillaCard({ id, name, badge, badgeColor, desc, beds, delay }: VillaProps) {
+  const { tr, dark, lang } = useApp()
+  const [lb, setLb] = useState<number | null>(null)
+  const vPhotos = VILLAS.find(v => v.id === id)!.photos
+  const images = vPhotos.map((src, i) => ({ src, alt: `${name} — photo ${i + 1}` }))
+  const features = [tr.villas.pool, tr.villas.sea_view, tr.villas.kitchen, tr.villas.balcony]
 
   return (
     <Reveal delay={delay}>
-      <div className={cn('rounded-3xl overflow-hidden shadow-xl', dark ? 'bg-ocean-800' : 'bg-white border border-sand-100')}>
+      <Lightbox images={images} index={lb} onChange={setLb} />
+      <div id={id} className={cn('scroll-mt-28 rounded-3xl overflow-hidden shadow-xl', dark ? 'bg-ocean-800' : 'bg-white border border-sand-100')}>
         {/* Photo grid */}
         <div className="grid grid-cols-3 gap-1 h-72 md:h-96">
-          <div className="col-span-2 relative overflow-hidden group">
+          <div className="col-span-2 relative overflow-hidden group cursor-pointer" onClick={() => setLb(0)}>
             <img src={vPhotos[0]} alt={name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <button
+              type="button"
+              onClick={e => { e.stopPropagation(); setLb(0) }}
+              className="absolute bottom-4 left-4 inline-flex items-center gap-2 bg-white/90 hover:bg-white text-ocean-500 font-body text-xs font-medium px-3.5 py-2 rounded-full shadow-lg cursor-pointer transition-colors"
+            >
+              <Images size={14} /> {tr.x.view_photos} ({vPhotos.length})
+            </button>
             <span className={`absolute top-4 left-4 text-xs font-semibold font-body px-3 py-1 rounded-full ${badgeColor}`}>
               {badge}
             </span>
           </div>
           <div className="grid grid-rows-2 gap-1">
             {vPhotos.slice(1, 3).map((src, i) => (
-              <div key={i} className="overflow-hidden group">
+              <div key={i} className="overflow-hidden group cursor-pointer" onClick={() => setLb(i + 1)}>
                 <img src={src} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
               </div>
             ))}
@@ -63,7 +62,7 @@ function VillaCard({ name, badge, badgeColor, desc, beds, photos: vPhotos, delay
                   <h2 className={`font-heading text-3xl font-bold mb-1 ${dark ? 'text-sand-100' : 'text-ocean-500'}`}>{name}</h2>
                   <div className="flex items-center gap-1.5 text-gold font-body text-sm">
                     <Waves size={13} />
-                    <span>50m from Tamelalt Beach · Club Evasion Resort</span>
+                    <span>{tr.home.stats_beach} · Club Evasion Resort</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 bg-gold/10 px-3 py-1.5 rounded-full">
@@ -78,7 +77,7 @@ function VillaCard({ name, badge, badgeColor, desc, beds, photos: vPhotos, delay
                 {[
                   { icon: Users, val: `4 ${tr.villas.guests}` },
                   { icon: Bed, val: `2 ${tr.villas.beds}` },
-                  { icon: Bath, val: `1 ${tr.villas.sqm === 'm²' ? 'bathroom' : 'salle de bain'}` },
+                  { icon: Bath, val: lang === 'fr' ? '1 salle de bain' : '1 bathroom' },
                   { icon: Waves, val: `120 ${tr.villas.sqm}` },
                 ].map(({ icon: Icon, val }) => (
                   <span key={val} className={cn('flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-body text-sm', dark ? 'bg-ocean-700 text-sand-200' : 'bg-sand-50 text-ocean-500')}>
@@ -92,7 +91,7 @@ function VillaCard({ name, badge, badgeColor, desc, beds, photos: vPhotos, delay
 
               {/* Beds */}
               <div className="mb-7">
-                <h4 className={`font-heading text-sm uppercase tracking-widest mb-3 ${dark ? 'text-sand-400' : 'text-ocean-300'}`}>Sleeping Arrangements</h4>
+                <h4 className={`font-heading text-sm uppercase tracking-widest mb-3 ${dark ? 'text-sand-400' : 'text-ocean-300'}`}>{lang === 'fr' ? 'Couchages' : 'Sleeping arrangements'}</h4>
                 <div className="space-y-2">
                   {beds.map(({ label }) => (
                     <div key={label} className="flex items-center gap-2">
@@ -117,7 +116,7 @@ function VillaCard({ name, badge, badgeColor, desc, beds, photos: vPhotos, delay
                 </div>
                 <div className="flex items-center gap-2">
                   <Car size={13} className="text-gold shrink-0" />
-                  <span className={`font-body text-sm ${dark ? 'text-sand-200' : 'text-ocean-400'}`}>Free parking</span>
+                  <span className={`font-body text-sm ${dark ? 'text-sand-200' : 'text-ocean-400'}`}>{lang === 'fr' ? 'Parking gratuit' : 'Free parking'}</span>
                 </div>
               </div>
             </div>
@@ -145,13 +144,13 @@ function VillaCard({ name, badge, badgeColor, desc, beds, photos: vPhotos, delay
 
                 <div className="space-y-2">
                   <Link
-                    to="/booking"
+                    to={`/booking?villa=${id}`}
                     className="w-full flex justify-center items-center gap-1.5 bg-gold hover:bg-gold-600 text-white font-body text-sm font-medium py-3.5 rounded-xl transition-colors cursor-pointer"
                   >
                     {tr.villas.book_btn} <ChevronRight size={14} />
                   </Link>
                   <a
-                    href="https://wa.me/212671779770"
+                    href={waLink(`Hello, I'm interested in the ${name} at DreamCatcher Homes.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn('w-full flex justify-center items-center gap-1.5 font-body text-sm py-3.5 rounded-xl border transition-colors cursor-pointer', dark ? 'border-white/10 text-sand-200 hover:border-gold/50' : 'border-sand-200 text-ocean-500 hover:border-gold')}
@@ -173,6 +172,7 @@ export default function Villas() {
 
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
+      <Seo title={tr.villas.page_title} description={tr.villas.page_sub} />
       {/* Hero */}
       <div className="relative h-64 sm:h-80 overflow-hidden">
         <img src={photos[0]} alt="DreamCatcher Homes villas" className="w-full h-full object-cover" />
@@ -189,21 +189,21 @@ export default function Villas() {
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-14">
           <VillaCard
+            id="two-bedroom"
             name={tr.villas.v1_name}
             badge={tr.villas.v1_badge}
             badgeColor="bg-gold text-white"
             desc={tr.villas.v1_desc}
             beds={[{ label: tr.villas.v1_bed1 }, { label: tr.villas.v1_bed2 }, { label: tr.villas.v1_living }]}
-            photos={[photos[1], photos[5], photos[9]]}
             delay={0}
           />
           <VillaCard
+            id="deluxe"
             name={tr.villas.v2_name}
             badge={tr.villas.v2_badge}
             badgeColor="bg-ocean-500 text-white"
             desc={tr.villas.v2_desc}
             beds={[{ label: tr.villas.v2_bed1 }, { label: tr.villas.v2_bed2 }]}
-            photos={[photos[7], photos[12], photos[17]]}
             delay={0.1}
           />
         </div>

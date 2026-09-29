@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { MapPin, Plane, Car, Navigation } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import Seo from '@/components/Seo'
 import { cn } from '@/lib/utils'
 
 const photos = Array.from({ length: 42 }, (_, i) => `/photo${String(i + 1).padStart(2, '0')}.jpg`)
@@ -33,6 +34,7 @@ export default function Location() {
 
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
+      <Seo title={tr.location.page_title} description={tr.location.page_sub} />
       {/* Hero */}
       <div className="relative h-72 sm:h-96 overflow-hidden">
         <img src={photos[5]} alt="Mirleft Morocco location" className="w-full h-full object-cover" />

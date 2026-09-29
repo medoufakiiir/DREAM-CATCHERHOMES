@@ -1,234 +1,264 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { CheckCircle } from 'lucide-react'
+import { CheckCircle, Check, Minus, Plus, CalendarDays, Users, Moon, Mail, AlertCircle } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import Seo from '@/components/Seo'
+import { SITE, VILLAS, VillaId, waLink, isoDate, addDays, nightsBetween, photo } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
-export default function Booking() {
-  const { dark } = useApp()
+const fmtDate = (iso: string, lang: string) =>
+  iso ? new Date(iso + 'T00:00:00').toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : '—'
 
-  const [form, setForm] = useState({
-    villa: '',
-    checkin: '',
-    checkout: '',
-    guests: '',
-    name: '',
-    phone: '',
-    email: '',
-    requests: '',
+function Stepper({ label, sub, value, min, max, onChange, dark }: {
+  label: string; sub: string; value: number; min: number; max: number; onChange: (n: number) => void; dark: boolean
+}) {
+  const btn = cn(
+    'w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed',
+    dark ? 'border-white/15 text-sand-200 hover:border-gold' : 'border-sand-200 text-ocean-500 hover:border-gold'
+  )
+  return (
+    <div className="flex items-center justify-between py-2">
+      <div>
+        <p className={cn('font-body text-sm font-medium', dark ? 'text-sand-100' : 'text-ocean-500')}>{label}</p>
+        <p className={cn('font-body text-xs', dark ? 'text-sand-400' : 'text-ocean-300')}>{sub}</p>
+      </div>
+      <div className="flex items-center gap-3">
+        <button type="button" className={btn} disabled={value <= min} onClick={() => onChange(value - 1)} aria-label={`- ${label}`}><Minus size={14} /></button>
+        <span className={cn('w-5 text-center font-body text-sm font-semibold', dark ? 'text-sand-100' : 'text-ocean-500')} aria-live="polite">{value}</span>
+        <button type="button" className={btn} disabled={value >= max} onClick={() => onChange(value + 1)} aria-label={`+ ${label}`}><Plus size={14} /></button>
+      </div>
+    </div>
+  )
+}
+
+export default function Booking() {
+  const { dark, tr, lang } = useApp()
+  const [params] = useSearchParams()
+  const today = isoDate(new Date())
+
+  const initVilla = params.get('villa')
+  const [villa, setVilla] = useState<VillaId | ''>(VILLAS.some(v => v.id === initVilla) ? (initVilla as VillaId) : '')
+  const [checkin, setCheckin] = useState(() => {
+    const c = params.get('checkin') ?? ''
+    return c >= today ? c : ''
   })
+  const [checkout, setCheckout] = useState(params.get('checkout') ?? '')
+  const [adults, setAdults] = useState(() => Math.min(6, Math.max(1, Number(params.get('adults')) || 2)))
+  const [children, setChildren] = useState(0)
+  const [form, setForm] = useState({ name: '', phone: '', email: '', requests: '' })
   const [sent, setSent] = useState(false)
 
-  const change = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
+  const nights = nightsBetween(checkin, checkout)
+  const datesInvalid = !!checkin && !!checkout && nights === 0
+  const guests = adults + children
+  const maxGuests = villa ? VILLAS.find(v => v.id === villa)!.maxGuests : 4
+  const overCapacity = guests > maxGuests
+
+  const villaName = (id: VillaId | '') =>
+    id === 'two-bedroom' ? tr.villas.v1_name : id === 'deluxe' ? tr.villas.v2_name : tr.x.search_any
+
+  const change = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm(f => ({ ...f, [e.target.name]: e.target.value }))
+
+  const message = [
+    'DreamCatcher Homes – Booking Request',
+    '',
+    `Villa: ${villaName(villa)}`,
+    `Check-in: ${fmtDate(checkin, 'en')}`,
+    `Check-out: ${fmtDate(checkout, 'en')}`,
+    `Nights: ${nights}`,
+    `Guests: ${adults} adult(s)${children ? `, ${children} child(ren)` : ''}`,
+    `Name: ${form.name}`,
+    `Phone: ${form.phone}`,
+    form.email ? `Email: ${form.email}` : '',
+    form.requests ? `Requests: ${form.requests}` : '',
+  ].filter(Boolean).join('\n')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const msg = [
-      '🌊 *DreamCatcher Homes – Booking Request*',
-      '',
-      `🏠 Villa: ${form.villa || 'Not specified'}`,
-      `📅 Check-in: ${form.checkin}`,
-      `📅 Check-out: ${form.checkout}`,
-      `👥 Guests: ${form.guests}`,
-      `👤 Name: ${form.name}`,
-      `📞 Phone: ${form.phone}`,
-      `📧 Email: ${form.email}`,
-      form.requests ? `📝 Requests: ${form.requests}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n')
-
-    window.open(`https://wa.me/212671779770?text=${encodeURIComponent(msg)}`, '_blank')
+    if (datesInvalid || nights === 0) return
+    window.open(waLink(message), '_blank', 'noopener')
     setSent(true)
   }
+
+  const mailHref = `mailto:${SITE.email}?subject=${encodeURIComponent('Booking request – DreamCatcher Homes')}&body=${encodeURIComponent(message)}`
 
   const fieldCls = cn(
     'w-full px-4 py-3 rounded-xl border font-body text-sm outline-none transition-all duration-200',
     'focus:border-gold focus:ring-2 focus:ring-gold/20',
-    dark
-      ? 'bg-ocean-800 border-white/10 text-sand-100 placeholder-white/25'
-      : 'bg-white border-sand-200 text-ocean-600 placeholder-ocean-300'
+    dark ? 'bg-ocean-900 border-white/10 text-sand-100 placeholder-white/25 [color-scheme:dark]' : 'bg-white border-sand-200 text-ocean-600 placeholder-ocean-300'
   )
-
-  const labelCls = cn(
-    'block font-body text-xs uppercase tracking-wider mb-1.5',
-    dark ? 'text-sand-400' : 'text-ocean-400'
-  )
+  const labelCls = cn('block font-body text-xs uppercase tracking-wider mb-1.5', dark ? 'text-sand-400' : 'text-ocean-400')
+  const card = cn('rounded-3xl p-6 md:p-8', dark ? 'bg-ocean-800' : 'bg-white shadow-sm')
+  const heading = cn('font-heading text-xl mb-5', dark ? 'text-sand-100' : 'text-ocean-500')
 
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-sand-50'}>
+      <Seo title={tr.booking.page_title} description={tr.booking.page_sub} />
       {/* Hero */}
       <div className="relative h-56 sm:h-64 overflow-hidden">
-        <img src="/photo04.jpg" alt="Book your stay" className="w-full h-full object-cover" />
+        <img src="/photo04.jpg" alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-ocean-900/65" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-5">
-          <p className="font-body text-xs uppercase tracking-widest text-gold mb-2">Reservations</p>
-          <h1 className="font-heading text-4xl sm:text-5xl text-white font-bold">Book Your Stay</h1>
-          <p className="font-body text-sm text-white/60 mt-2">Fill in the form — we'll confirm via WhatsApp</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-5 pt-10">
+          <p className="font-body text-xs uppercase tracking-widest text-gold mb-2">{tr.booking.page_label}</p>
+          <h1 className="font-heading text-4xl sm:text-5xl text-white font-bold">{tr.booking.page_title}</h1>
+          <p className="font-body text-sm text-white/70 mt-2">{tr.booking.page_sub}</p>
         </div>
       </div>
 
-      <section className="py-16">
-        <div className="max-w-2xl mx-auto px-5 sm:px-8">
-
+      <section className="py-12 md:py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8">
           {sent ? (
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center text-center py-20"
-            >
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className={cn(card, 'max-w-xl mx-auto flex flex-col items-center text-center py-16')}>
               <CheckCircle size={56} className="text-[#25D366] mb-5" />
-              <h2 className={`font-heading text-3xl mb-3 ${dark ? 'text-sand-100' : 'text-ocean-500'}`}>
-                Request Sent!
-              </h2>
-              <p className={`font-body text-sm max-w-sm mb-8 ${dark ? 'text-sand-300' : 'text-ocean-400'}`}>
-                Your booking request has been sent to our team on WhatsApp. We'll get back to you within a few hours to confirm.
-              </p>
-              <button
-                onClick={() => setSent(false)}
-                className="font-body text-sm text-gold hover:underline cursor-pointer"
-              >
-                ← Send another request
+              <h2 className={cn('font-heading text-3xl mb-3', dark ? 'text-sand-100' : 'text-ocean-500')}>{tr.booking.submitted_title}</h2>
+              <p className={cn('font-body text-sm max-w-sm mb-6', dark ? 'text-sand-300' : 'text-ocean-400')}>{tr.booking.submitted_sub}</p>
+              <a href={mailHref} className="inline-flex items-center gap-2 font-body text-sm text-gold hover:underline mb-4">
+                <Mail size={14} /> {tr.x.send_email}
+              </a>
+              <button onClick={() => setSent(false)} className="font-body text-sm text-gold hover:underline cursor-pointer">
+                {tr.booking.another}
               </button>
             </motion.div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className={cn('rounded-3xl p-8 md:p-10 shadow-sm', dark ? 'bg-ocean-800' : 'bg-white')}
-            >
-              <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+              <div className="space-y-6">
+                {/* Step 1 */}
+                <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className={card}>
+                  <h2 className={heading}>{tr.x.step_stay}</h2>
 
-                {/* Villa */}
-                <div>
-                  <label className={labelCls}>Which villa?</label>
-                  <select name="villa" value={form.villa} onChange={change} className={fieldCls}>
-                    <option value="">Select a villa…</option>
-                    <option>Two-Bedroom Villa</option>
-                    <option>Deluxe Villa</option>
-                  </select>
-                </div>
-
-                {/* Dates */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelCls}>Check-in date</label>
-                    <input
-                      type="text"
-                      name="checkin"
-                      placeholder="e.g. 20 July 2025"
-                      value={form.checkin}
-                      onChange={change}
-                      required
-                      className={fieldCls}
-                    />
+                  <p className={labelCls}>{tr.booking.villa_label}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                    {VILLAS.map(v => {
+                      const active = villa === v.id
+                      return (
+                        <button
+                          type="button"
+                          key={v.id}
+                          onClick={() => setVilla(active ? '' : v.id)}
+                          aria-pressed={active}
+                          className={cn(
+                            'relative flex items-center gap-3 p-2.5 rounded-2xl border-2 text-left transition-all cursor-pointer',
+                            active ? 'border-gold bg-gold/5' : dark ? 'border-white/10 hover:border-white/25' : 'border-sand-100 hover:border-sand-300'
+                          )}
+                        >
+                          <img src={v.photos[0]} alt="" className="w-20 h-16 rounded-xl object-cover shrink-0" />
+                          <div>
+                            <p className={cn('font-heading text-base font-semibold', dark ? 'text-sand-100' : 'text-ocean-500')}>{villaName(v.id)}</p>
+                            <p className={cn('font-body text-xs', dark ? 'text-sand-400' : 'text-ocean-300')}>
+                              {tr.villas.pool} · {v.maxGuests} {tr.villas.guests}
+                            </p>
+                          </div>
+                          {active && <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold flex items-center justify-center"><Check size={12} className="text-white" /></span>}
+                        </button>
+                      )
+                    })}
                   </div>
-                  <div>
-                    <label className={labelCls}>Check-out date</label>
-                    <input
-                      type="text"
-                      name="checkout"
-                      placeholder="e.g. 27 July 2025"
-                      value={form.checkout}
-                      onChange={change}
-                      required
-                      className={fieldCls}
-                    />
+
+                  <div className="grid grid-cols-2 gap-4 mb-2">
+                    <div>
+                      <label htmlFor="bk-in" className={labelCls}>{tr.booking.checkin_label}</label>
+                      <input
+                        id="bk-in" type="date" required min={today} value={checkin}
+                        onChange={e => {
+                          setCheckin(e.target.value)
+                          if (!checkout || checkout <= e.target.value) setCheckout(addDays(e.target.value, 3))
+                        }}
+                        className={fieldCls}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="bk-out" className={labelCls}>{tr.booking.checkout_label}</label>
+                      <input
+                        id="bk-out" type="date" required min={checkin ? addDays(checkin, 1) : addDays(today, 1)} value={checkout}
+                        onChange={e => setCheckout(e.target.value)}
+                        className={fieldCls}
+                      />
+                    </div>
+                  </div>
+                  {datesInvalid && (
+                    <p className="flex items-center gap-1.5 font-body text-xs text-red-500 mb-2"><AlertCircle size={13} /> {tr.x.dates_error}</p>
+                  )}
+
+                  <div className={cn('mt-4 pt-3 border-t', dark ? 'border-white/10' : 'border-sand-100')}>
+                    <Stepper label={tr.x.adults} sub={tr.x.adults_sub} value={adults} min={1} max={6} onChange={setAdults} dark={dark} />
+                    <Stepper label={tr.x.children} sub={tr.x.children_sub} value={children} min={0} max={4} onChange={setChildren} dark={dark} />
+                    {overCapacity && (
+                      <p className="flex items-center gap-1.5 font-body text-xs text-amber-600 mt-1">
+                        <AlertCircle size={13} /> {tr.x.capacity_note.replace('{n}', String(maxGuests))}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+
+                {/* Step 2 */}
+                <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.08 }} className={card}>
+                  <h2 className={heading}>{tr.x.step_details}</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="bk-name" className={labelCls}>{tr.booking.name_label}</label>
+                      <input id="bk-name" type="text" name="name" placeholder={tr.x.name_ph} value={form.name} onChange={change} required autoComplete="name" className={fieldCls} />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="bk-phone" className={labelCls}>{tr.booking.phone_label}</label>
+                        <input id="bk-phone" type="tel" name="phone" placeholder="+44 7700 900 000" value={form.phone} onChange={change} required autoComplete="tel" className={fieldCls} />
+                      </div>
+                      <div>
+                        <label htmlFor="bk-email" className={labelCls}>{tr.booking.email_label} <span className="normal-case opacity-60">({tr.x.optional})</span></label>
+                        <input id="bk-email" type="email" name="email" placeholder="you@example.com" value={form.email} onChange={change} autoComplete="email" className={fieldCls} />
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="bk-req" className={labelCls}>{tr.booking.requests_label} <span className="normal-case opacity-60">({tr.x.optional})</span></label>
+                      <textarea id="bk-req" name="requests" rows={3} placeholder={tr.x.requests_ph} value={form.requests} onChange={change} className={cn(fieldCls, 'resize-none')} />
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Summary */}
+              <motion.aside initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }} className={cn(card, 'lg:sticky lg:top-28 !p-0 overflow-hidden')}>
+                <div className="relative h-36">
+                  <img src={villa ? VILLAS.find(v => v.id === villa)!.photos[0] : photo(17)} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ocean-900/80 to-transparent" />
+                  <div className="absolute bottom-3 left-5 text-white">
+                    <p className="font-body text-[10px] uppercase tracking-widest text-gold">{tr.x.your_stay}</p>
+                    <p className="font-heading text-xl font-semibold">{villaName(villa)}</p>
                   </div>
                 </div>
+                <div className="p-6">
+                  <dl className={cn('space-y-3 font-body text-sm mb-5', dark ? 'text-sand-200' : 'text-ocean-500')}>
+                    <div className="flex items-center gap-3"><CalendarDays size={15} className="text-gold shrink-0" /><dt className="sr-only">{tr.booking.checkin_label}</dt><dd>{fmtDate(checkin, lang)}</dd></div>
+                    <div className="flex items-center gap-3"><CalendarDays size={15} className="text-gold shrink-0" /><dt className="sr-only">{tr.booking.checkout_label}</dt><dd>{fmtDate(checkout, lang)}</dd></div>
+                    <div className="flex items-center gap-3"><Moon size={15} className="text-gold shrink-0" /><dd>{nights} {nights === 1 ? tr.x.night_one : tr.x.night_many}</dd></div>
+                    <div className="flex items-center gap-3"><Users size={15} className="text-gold shrink-0" /><dd>{guests} {guests === 1 ? tr.x.guest_one : tr.x.guest_many}</dd></div>
+                  </dl>
 
-                {/* Guests */}
-                <div>
-                  <label className={labelCls}>Number of guests</label>
-                  <input
-                    type="text"
-                    name="guests"
-                    placeholder="e.g. 2 adults, 1 child"
-                    value={form.guests}
-                    onChange={change}
-                    required
-                    className={fieldCls}
-                  />
-                </div>
-
-                <div className={cn('h-px', dark ? 'bg-white/8' : 'bg-sand-100')} />
-
-                {/* Contact */}
-                <div>
-                  <label className={labelCls}>Your name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Full name"
-                    value={form.name}
-                    onChange={change}
-                    required
-                    autoComplete="name"
-                    className={fieldCls}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelCls}>Phone / WhatsApp</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="+44 7700 900 000"
-                      value={form.phone}
-                      onChange={change}
-                      required
-                      autoComplete="tel"
-                      className={fieldCls}
-                    />
+                  <div className={cn('pt-4 mb-5 border-t space-y-2', dark ? 'border-white/10' : 'border-sand-100')}>
+                    <p className={cn('font-body text-[10px] uppercase tracking-widest mb-2', dark ? 'text-sand-400' : 'text-ocean-300')}>{tr.x.included}</p>
+                    {[tr.x.inc_1, tr.x.inc_2, tr.x.inc_3, tr.x.inc_4, tr.x.inc_5].map(t => (
+                      <p key={t} className={cn('flex items-center gap-2 font-body text-xs', dark ? 'text-sand-300' : 'text-ocean-400')}>
+                        <Check size={12} className="text-green-500 shrink-0" /> {t}
+                      </p>
+                    ))}
                   </div>
-                  <div>
-                    <label className={labelCls}>Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="you@example.com"
-                      value={form.email}
-                      onChange={change}
-                      autoComplete="email"
-                      className={fieldCls}
-                    />
-                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={datesInvalid}
+                    className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-body font-semibold py-4 rounded-xl transition-colors cursor-pointer text-sm"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.558 4.114 1.528 5.836L0 24l6.335-1.51A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm5.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /></svg>
+                    {tr.x.send_wa}
+                  </button>
+                  <p className={cn('font-body text-xs text-center mt-3', dark ? 'text-sand-500' : 'text-ocean-300')}>
+                    {tr.x.reply_fast} · {SITE.phoneDisplay}
+                  </p>
                 </div>
-
-                {/* Requests */}
-                <div>
-                  <label className={labelCls}>Special requests (optional)</label>
-                  <textarea
-                    name="requests"
-                    rows={3}
-                    placeholder="Early check-in, dietary needs, airport pickup…"
-                    value={form.requests}
-                    onChange={change}
-                    className={cn(fieldCls, 'resize-none')}
-                  />
-                </div>
-
-                {/* Submit */}
-                <button
-                  type="submit"
-                  className="w-full flex items-center justify-center gap-3 bg-[#25D366] hover:bg-green-600 text-white font-body font-semibold py-4 rounded-xl transition-colors cursor-pointer text-sm"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.558 4.114 1.528 5.836L0 24l6.335-1.51A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.807 9.807 0 01-5.031-1.387l-.361-.214-3.762.897.939-3.65-.235-.374A9.808 9.808 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z" />
-                  </svg>
-                  Send Request on WhatsApp
-                </button>
-
-                <p className={`font-body text-xs text-center ${dark ? 'text-sand-500' : 'text-ocean-300'}`}>
-                  Opens WhatsApp with your details pre-filled · +212 671-779770
-                </p>
-              </form>
-            </motion.div>
+              </motion.aside>
+            </form>
           )}
         </div>
       </section>

@@ -18,7 +18,7 @@ export default function Footer() {
 
   return (
     <footer className={dark ? 'bg-ocean-900 border-t border-white/5' : 'bg-ocean-500'}>
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-16 pb-24 md:pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
 
           {/* Brand */}
@@ -90,8 +90,8 @@ export default function Footer() {
           <div>
             <h4 className="font-body text-xs uppercase tracking-widest text-white/40 mb-5">{tr.footer.legal}</h4>
             <ul className="space-y-2.5 mb-6">
-              <li><a href="#" className="font-body text-sm text-white/60 hover:text-white transition-colors cursor-pointer">{tr.footer.privacy}</a></li>
-              <li><a href="#" className="font-body text-sm text-white/60 hover:text-white transition-colors cursor-pointer">{tr.footer.terms}</a></li>
+              <li><Link to="/privacy" className="font-body text-sm text-white/60 hover:text-white transition-colors cursor-pointer">{tr.footer.privacy}</Link></li>
+              <li><Link to="/terms" className="font-body text-sm text-white/60 hover:text-white transition-colors cursor-pointer">{tr.footer.terms}</Link></li>
             </ul>
             <Link
               to="/booking"

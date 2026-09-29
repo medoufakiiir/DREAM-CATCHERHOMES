@@ -1,25 +1,55 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useScroll, useTransform } from 'motion/react'
-import { Star, Waves, ChevronDown, CalendarDays, Award, CreditCard, BadgeCheck } from 'lucide-react'
+import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react'
+import { Star, Waves, ChevronDown, CalendarDays, Award, CreditCard, BadgeCheck, Plus } from 'lucide-react'
 import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1'
+import Reveal from '@/components/ui/Reveal'
+import SearchBar from '@/components/SearchBar'
+import Seo from '@/components/Seo'
 import { useApp } from '@/context/AppContext'
 import { testimonials } from '@/i18n/translations'
+import { photos, waLink } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
-const photos = Array.from({ length: 42 }, (_, i) => `/photo${String(i + 1).padStart(2, '0')}.jpg`)
-
-function Reveal({ children, delay = 0, y = 32, className = '' }: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
+function Faq() {
+  const { tr, dark } = useApp()
+  const [open, setOpen] = useState<number | null>(0)
   return (
-    <motion.div
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.75, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
+    <section className={`py-24 ${dark ? 'bg-ocean-900' : 'bg-white'}`}>
+      <div className="max-w-3xl mx-auto px-5 sm:px-8">
+        <Reveal className="text-center mb-12">
+          <p className="font-body text-xs uppercase tracking-widest text-gold mb-3">{tr.x.faq_label}</p>
+          <h2 className={`font-heading text-4xl ${dark ? 'text-sand-100' : 'text-ocean-500'}`}>{tr.x.faq_title}</h2>
+        </Reveal>
+        <div className={cn('divide-y border-y', dark ? 'divide-white/10 border-white/10' : 'divide-sand-100 border-sand-100')}>
+          {tr.x.faq.map(([q, a], i) => (
+            <div key={q}>
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                aria-expanded={open === i}
+                className="w-full flex items-center justify-between gap-6 py-5 text-left cursor-pointer group"
+              >
+                <span className={cn('font-heading text-lg', dark ? 'text-sand-100' : 'text-ocean-500', 'group-hover:text-gold transition-colors')}>{q}</span>
+                <Plus size={18} className={cn('text-gold shrink-0 transition-transform duration-300', open === i && 'rotate-45')} />
+              </button>
+              <AnimatePresence initial={false}>
+                {open === i && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <p className={cn('font-body text-sm leading-relaxed pb-5 pr-10', dark ? 'text-sand-300/80' : 'text-ocean-400')}>{a}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -36,9 +66,10 @@ export default function Home() {
 
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
+      <Seo title="DreamCatcher Homes — Luxury Beachfront Villas in Mirleft, Morocco" description={tr.home.sub} />
 
       {/* ═══════════ HERO ═══════════ */}
-      <section ref={heroRef} className="relative h-screen min-h-[600px] overflow-hidden">
+      <section ref={heroRef} className="relative h-screen min-h-[720px] overflow-hidden">
         <motion.div style={{ y: bgY }} className="absolute inset-0 will-change-transform">
           <img
             src={photos[16]}
@@ -66,37 +97,23 @@ export default function Home() {
               <img
                 src="/logo.png"
                 alt="DreamCatcher Homes"
-                className="mx-auto h-40 sm:h-52 md:h-64 lg:h-72 w-auto object-contain brightness-0 invert"
+                className="mx-auto h-32 sm:h-44 md:h-52 lg:h-60 w-auto object-contain brightness-0 invert"
               />
             </h1>
           </Reveal>
 
           <Reveal delay={0.3}>
-            <p className="font-body text-base sm:text-lg text-white/75 max-w-xl leading-relaxed mt-6 mb-10">
+            <p className="font-body text-base sm:text-lg text-white/75 max-w-xl leading-relaxed mt-4 mb-8">
               {tr.home.sub}
             </p>
           </Reveal>
 
-          <Reveal delay={0.42}>
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <Link
-                to="/booking"
-                className="inline-flex items-center gap-2 bg-gold hover:bg-gold-600 text-white font-body font-medium px-8 py-3.5 rounded-full transition-colors duration-200 cursor-pointer shadow-xl shadow-gold/30 text-sm"
-              >
-                <CalendarDays size={16} />
-                {tr.home.cta_book}
-              </Link>
-              <Link
-                to="/villas"
-                className="inline-flex items-center gap-2 border border-white/30 hover:border-white/70 text-white font-body text-sm px-8 py-3.5 rounded-full backdrop-blur-sm transition-colors duration-200 cursor-pointer"
-              >
-                {tr.home.cta_villas}
-              </Link>
-            </div>
+          <Reveal delay={0.42} className="w-full flex justify-center">
+            <SearchBar />
           </Reveal>
 
           {/* Rating pill */}
-          <Reveal delay={0.55} className="mt-10">
+          <Reveal delay={0.55} className="mt-6 flex flex-col sm:flex-row items-center gap-3">
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => <Star key={i} size={11} fill="#C9A84C" className="text-gold" />)}
@@ -105,12 +122,15 @@ export default function Home() {
               <span className="text-white/30 text-xs">·</span>
               <span className="font-body text-xs text-white/70">{tr.home.stats_reviews}</span>
             </div>
+            <Link to="/villas" className="font-body text-xs text-white/80 hover:text-white underline underline-offset-4 decoration-white/30 hover:decoration-gold transition-colors">
+              {tr.home.cta_villas} →
+            </Link>
           </Reveal>
         </motion.div>
 
         {/* Scroll cue */}
         <motion.div
-          className="absolute bottom-7 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 text-white/50 cursor-default"
+          className="absolute bottom-7 left-1/2 -translate-x-1/2 z-10 hidden sm:flex flex-col items-center gap-1 text-white/50 cursor-default"
           animate={{ y: [0, 7, 0] }}
           transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
         >
@@ -154,11 +174,11 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {[
-              { photo: photos[1], name: tr.villas.v1_name, badge: tr.villas.v1_badge, slug: 'Two-Bedroom', delay: 0 },
-              { photo: photos[7], name: tr.villas.v2_name, badge: tr.villas.v2_badge, slug: 'Deluxe', delay: 0.1 },
-            ].map(({ photo, name, badge, delay }) => (
+              { photo: photos[1], name: tr.villas.v1_name, badge: tr.villas.v1_badge, slug: 'two-bedroom', delay: 0 },
+              { photo: photos[7], name: tr.villas.v2_name, badge: tr.villas.v2_badge, slug: 'deluxe', delay: 0.1 },
+            ].map(({ photo, name, badge, slug, delay }) => (
               <Reveal key={name} delay={delay}>
-                <Link to="/villas" className="group block cursor-pointer">
+                <Link to={`/villas#${slug}`} className="group block cursor-pointer">
                   <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
                     <img
                       src={photo}
@@ -199,7 +219,7 @@ export default function Home() {
                 dark ? 'border-white/15 text-sand-200 hover:border-gold hover:text-gold' : 'border-sand-200 text-ocean-400 hover:border-gold hover:text-gold'
               }`}
             >
-              View full villa details →
+              {tr.home.cta_villas} →
             </Link>
           </Reveal>
         </div>
@@ -247,7 +267,7 @@ export default function Home() {
                 to="/dining"
                 className="inline-flex items-center gap-2 bg-gold hover:bg-gold-600 text-white font-body text-sm font-medium px-6 py-3 rounded-full transition-colors cursor-pointer"
               >
-                Explore Dining →
+                {tr.nav.dining} →
               </Link>
             </Reveal>
           </div>
@@ -268,10 +288,10 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {[
-              { icon: BadgeCheck, title: tr.home.trust_cancel, sub: 'No fees, no risk' },
-              { icon: CreditCard, title: tr.home.trust_prepay, sub: 'Pay at property' },
+              { icon: BadgeCheck, title: tr.home.trust_cancel, sub: tr.x.trust_cancel_sub },
+              { icon: CreditCard, title: tr.home.trust_prepay, sub: tr.villas.pay_property },
               { icon: Award, title: tr.home.trust_choice, sub: 'Booking.com 2024' },
-              { icon: Star, title: tr.home.trust_rating, sub: '246 verified reviews', fill: true },
+              { icon: Star, title: tr.home.trust_rating, sub: tr.home.stats_reviews, fill: true },
             ].map(({ icon: Icon, title, sub, fill }) => (
               <Reveal key={title}>
                 <div className={cn(
@@ -317,7 +337,7 @@ export default function Home() {
       <section className={`py-24 ${dark ? 'bg-ocean-900' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <Reveal className="text-center mb-12">
-            <p className="font-body text-xs uppercase tracking-widest text-gold mb-3">Gallery</p>
+            <p className="font-body text-xs uppercase tracking-widest text-gold mb-3">{tr.nav.gallery}</p>
             <h2 className={`font-heading text-4xl ${dark ? 'text-sand-100' : 'text-ocean-500'}`}>Life at DreamCatcher</h2>
           </Reveal>
 
@@ -344,11 +364,13 @@ export default function Home() {
 
           <Reveal delay={0.2} className="text-center mt-9">
             <Link to="/gallery" className={`inline-flex items-center gap-2 font-body text-sm px-6 py-3 rounded-full border transition-colors cursor-pointer ${dark ? 'border-white/15 text-sand-200 hover:border-gold hover:text-gold' : 'border-sand-200 text-ocean-400 hover:border-gold hover:text-gold'}`}>
-              View all 42 photos →
+              {tr.x.view_photos} (42) →
             </Link>
           </Reveal>
         </div>
       </section>
+
+      <Faq />
 
       {/* ═══════════ FINAL CTA ═══════════ */}
       <section className="relative py-28 overflow-hidden">
@@ -374,7 +396,7 @@ export default function Home() {
                 {tr.home.cta_btn}
               </Link>
               <a
-                href="https://wa.me/212671779770"
+                href={waLink()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 border border-white/25 hover:border-white/60 text-white font-body text-sm px-8 py-4 rounded-full transition-colors cursor-pointer"

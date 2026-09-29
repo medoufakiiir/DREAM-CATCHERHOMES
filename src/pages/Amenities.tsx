@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { Waves, Wifi, Car, Utensils, TreePalm, Coffee, Tv, Bike, Plane, PawPrint, Accessibility, Users, Flame, Shield, Baby, CreditCard, Clock, MapPin, Mountain, Dumbbell, BedDouble, Bath, ChefHat, Wind } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import Seo from '@/components/Seo'
 import { cn } from '@/lib/utils'
 
 const photos = Array.from({ length: 42 }, (_, i) => `/photo${String(i + 1).padStart(2, '0')}.jpg`)
@@ -110,6 +111,7 @@ export default function Amenities() {
 
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
+      <Seo title={tr.amenities.page_title} description={tr.amenities.page_sub} />
       {/* Hero */}
       <div className="relative h-64 sm:h-80 overflow-hidden">
         <img src={photos[15]} alt="DreamCatcher Homes amenities" className="w-full h-full object-cover" />

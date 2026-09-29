@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import Seo from '@/components/Seo'
+import { photos, SITE, waLink } from '@/lib/site'
 import { cn } from '@/lib/utils'
-
-const photos = Array.from({ length: 42 }, (_, i) => `/photo${String(i + 1).padStart(2, '0')}.jpg`)
 
 function Reveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   return (
@@ -29,11 +29,26 @@ export default function Contact() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [e.target.name]: e.target.value }))
 
+  const composed = () => [
+    `DreamCatcher Homes – ${form.subject || 'Enquiry'}`,
+    '',
+    form.message,
+    '',
+    `— ${form.name}`,
+    form.email,
+    form.phone,
+  ].filter(Boolean).join('\n')
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setTimeout(() => { setLoading(false); setSent(true) }, 1000)
+    window.open(waLink(composed()), '_blank', 'noopener')
+    setLoading(false)
+    setSent(true)
   }
+
+  const mailHref = () =>
+    `mailto:${SITE.email}?subject=${encodeURIComponent(form.subject || 'Enquiry – DreamCatcher Homes')}&body=${encodeURIComponent(composed())}`
 
   const inputCls = cn(
     'w-full px-4 py-3.5 rounded-xl border font-body text-sm outline-none transition-all duration-200',
@@ -45,6 +60,7 @@ export default function Contact() {
 
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
+      <Seo title={tr.contact.page_title} description={tr.contact.page_sub} />
       {/* Hero */}
       <div className="relative h-64 sm:h-80 overflow-hidden">
         <img src={photos[32]} alt="Contact DreamCatcher Homes" className="w-full h-full object-cover" />
@@ -96,7 +112,7 @@ export default function Contact() {
 
                 {/* WhatsApp CTA */}
                 <a
-                  href="https://wa.me/212671779770"
+                  href={waLink()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-3 bg-[#25D366] hover:bg-green-600 text-white font-body font-medium px-6 py-3.5 rounded-full transition-colors cursor-pointer mb-10"
@@ -132,7 +148,9 @@ export default function Contact() {
                   >
                     <CheckCircle size={52} className="text-green-500 mb-5" />
                     <h3 className={`font-heading text-2xl mb-2 ${dark ? 'text-sand-100' : 'text-ocean-500'}`}>{tr.contact.sent_title}</h3>
-                    <p className={`font-body text-sm max-w-xs ${dark ? 'text-sand-300' : 'text-ocean-400'}`}>{tr.contact.sent_sub}</p>
+                    <p className={`font-body text-sm max-w-xs mb-5 ${dark ? 'text-sand-300' : 'text-ocean-400'}`}>{tr.contact.sent_sub}</p>
+                    <a href={mailHref()} className="inline-flex items-center gap-2 font-body text-sm text-gold hover:underline mb-3"><Mail size={14} /> {tr.x.send_email}</a>
+                    <button onClick={() => setSent(false)} className="font-body text-sm text-gold hover:underline cursor-pointer">←</button>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit}>
@@ -173,6 +191,7 @@ export default function Contact() {
                           <><Send size={15} /> {tr.contact.send}</>
                         )}
                       </button>
+                      <p className={`font-body text-xs text-center ${dark ? 'text-sand-500' : 'text-ocean-300'}`}>{tr.x.contact_via}</p>
                     </div>
                   </form>
                 )}
