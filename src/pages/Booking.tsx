@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { CheckCircle, Check, Minus, Plus, CalendarDays, Users, Moon, Mail, AlertCircle } from 'lucide-react'
@@ -6,6 +6,7 @@ import { useApp } from '@/context/AppContext'
 import Seo from '@/components/Seo'
 import PageHero from '@/components/PageHero'
 import { SITE, VILLAS, VillaId, waLink, isoDate, addDays, nightsBetween, photo } from '@/lib/site'
+import { db, overlaps, BookedRange } from '@/lib/db'
 import { cn } from '@/lib/utils'
 
 const fmtDate = (iso: string, lang: string) =>
@@ -50,7 +51,12 @@ export default function Booking() {
   const [form, setForm] = useState({ name: '', phone: '', email: '', requests: '' })
   const [sent, setSent] = useState(false)
 
+  const [ranges, setRanges] = useState<BookedRange[]>([])
+  useEffect(() => { db.bookedRanges().then(setRanges).catch(() => {}) }, [])
+
   const nights = nightsBetween(checkin, checkout)
+  const taken = (v: VillaId) => nights > 0 && ranges.some(r => (r.villa === v || !r.villa) && overlaps(checkin, checkout, r.checkin, r.checkout))
+  const unavailable = villa ? taken(villa) : nights > 0 && VILLAS.every(v => taken(v.id))
   const datesInvalid = !!checkin && !!checkout && nights === 0
   const guests = adults + children
   const maxGuests = villa ? VILLAS.find(v => v.id === villa)!.maxGuests : 4
@@ -78,8 +84,13 @@ export default function Booking() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (datesInvalid || nights === 0) return
+    if (datesInvalid || nights === 0 || unavailable) return
     window.open(waLink(message), '_blank', 'noopener')
+    // Also store the request for the admin panel (never blocks the guest)
+    db.createBooking({
+      villa: villa || null, checkin, checkout, adults, children,
+      name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim() || null, requests: form.requests.trim() || null,
+    }).catch(() => {})
     setSent(true)
   }
 
@@ -141,6 +152,7 @@ export default function Booking() {
                             <p className={cn('font-body text-xs', dark ? 'text-sand-400' : 'text-ocean-300')}>
                               {tr.villas.pool} · {v.maxGuests} {tr.villas.guests}
                             </p>
+                            {taken(v.id) && <p className="font-body text-[11px] font-semibold text-red-500 mt-0.5">{tr.x.villa_taken}</p>}
                           </div>
                           {active && <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold flex items-center justify-center"><Check size={12} className="text-white" /></span>}
                         </button>
@@ -169,6 +181,9 @@ export default function Booking() {
                       />
                     </div>
                   </div>
+                  {unavailable && (
+                    <p className="flex items-center gap-1.5 font-body text-xs text-red-500 mb-2"><AlertCircle size={13} /> {tr.x.unavailable}</p>
+                  )}
                   {datesInvalid && (
                     <p className="flex items-center gap-1.5 font-body text-xs text-red-500 mb-2"><AlertCircle size={13} /> {tr.x.dates_error}</p>
                   )}
@@ -239,7 +254,7 @@ export default function Booking() {
 
                   <button
                     type="submit"
-                    disabled={datesInvalid}
+                    disabled={datesInvalid || unavailable}
                     className="w-full flex items-center justify-center gap-2.5 bg-gold hover:bg-gold-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-body text-[11px] uppercase tracking-[0.18em] font-semibold py-4 transition-colors cursor-pointer"
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.558 4.114 1.528 5.836L0 24l6.335-1.51A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm5.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /></svg>

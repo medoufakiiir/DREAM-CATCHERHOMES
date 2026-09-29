@@ -13,11 +13,25 @@ const Contact = lazy(() => import('@/pages/Contact'))
 const Booking = lazy(() => import('@/pages/Booking'))
 const Legal = lazy(() => import('@/pages/Legal'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
+const AdminApp = lazy(() => import('@/admin/AdminApp'))
 
 export default function App() {
   return (
     <BrowserRouter>
       <AppProvider>
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <Routes>
+            <Route path="/admin/*" element={<AdminApp />} />
+            <Route path="*" element={<PublicSite />} />
+          </Routes>
+        </Suspense>
+      </AppProvider>
+    </BrowserRouter>
+  )
+}
+
+function PublicSite() {
+  return (
         <Layout>
           <Suspense fallback={<div className="min-h-screen" />}>
             <Routes>
@@ -35,7 +49,5 @@ export default function App() {
             </Routes>
           </Suspense>
         </Layout>
-      </AppProvider>
-    </BrowserRouter>
   )
 }

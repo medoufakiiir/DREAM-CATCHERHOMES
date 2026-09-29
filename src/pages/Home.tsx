@@ -6,7 +6,7 @@ import Reveal from '@/components/ui/Reveal'
 import SearchBar from '@/components/SearchBar'
 import Seo from '@/components/Seo'
 import { useApp } from '@/context/AppContext'
-import { testimonials } from '@/i18n/translations'
+import { testimonials as fallbackReviews } from '@/i18n/translations'
 import { photo, VILLAS, waLink } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
@@ -227,12 +227,20 @@ function Days() {
 function Reviews() {
   const { tr, dark } = useApp()
   const [i, setI] = useState(0)
+  const [testimonials, setReviews] = useState(fallbackReviews)
+  useEffect(() => {
+    // Loaded lazily so the database client stays out of the initial bundle
+    import('@/lib/db')
+      .then(({ db }) => db.publishedReviews())
+      .then(r => { if (r.length) setReviews(r.map(x => ({ text: x.text, name: x.name, role: x.country }))) })
+      .catch(() => {})
+  }, [])
   const n = testimonials.length
   useEffect(() => {
     const t = setInterval(() => setI(x => (x + 1) % n), 7000)
     return () => clearInterval(t)
   }, [i, n])
-  const t = testimonials[i]
+  const t = testimonials[i % n]
   const btn = cn('w-12 h-12 border flex items-center justify-center transition-colors cursor-pointer', dark ? 'border-white/15 text-sand-100 hover:border-gold hover:text-gold' : 'border-ocean-500/20 text-ocean-500 hover:border-gold hover:text-gold')
 
   return (

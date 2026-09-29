@@ -5,6 +5,7 @@ import { useApp } from '@/context/AppContext'
 import Seo from '@/components/Seo'
 import PageHero from '@/components/PageHero'
 import { SITE, waLink } from '@/lib/site'
+import { db } from '@/lib/db'
 import { cn } from '@/lib/utils'
 
 function Reveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
@@ -44,6 +45,10 @@ export default function Contact() {
     e.preventDefault()
     setLoading(true)
     window.open(waLink(composed()), '_blank', 'noopener')
+    db.createMessage({
+      name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim() || null,
+      subject: form.subject.trim() || null, message: form.message.trim(),
+    }).catch(() => {})
     setLoading(false)
     setSent(true)
   }
