@@ -13,13 +13,14 @@ export default function Footer() {
     ['/amenities', tr.nav.amenities],
     ['/gallery', tr.nav.gallery],
     ['/location', tr.nav.location],
+    ['/journal', tr.nav.journal],
     ['/contact', tr.nav.contact],
     ['/booking', tr.nav.book],
   ] as [string, string][]
 
   return (
     <footer className={dark ? 'bg-ocean-900 border-t border-white/5' : 'bg-ocean-500'}>
-      {pathname !== '/' && pathname !== '/booking' && <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-20 pb-14 border-b border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+      {pathname !== '/' && pathname !== '/booking' && !pathname.startsWith('/journal/') && <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-20 pb-14 border-b border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <p className="font-heading text-white text-4xl sm:text-6xl leading-[1.05] max-w-2xl">{tr.x.c_title}</p>
         <Link to="/booking" className="shrink-0 inline-flex items-center justify-center bg-gold hover:bg-gold-600 text-white font-body text-[11px] uppercase tracking-[0.22em] font-semibold px-8 py-4 transition-colors">
           {tr.home.cta_btn} →

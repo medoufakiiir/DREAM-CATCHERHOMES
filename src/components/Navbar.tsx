@@ -12,6 +12,7 @@ const links = [
   { key: 'amenities' as const, path: '/amenities' },
   { key: 'gallery' as const, path: '/gallery' },
   { key: 'location' as const, path: '/location' },
+  { key: 'journal' as const, path: '/journal' },
   { key: 'contact' as const, path: '/contact' },
 ]
 

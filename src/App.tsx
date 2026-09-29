@@ -12,6 +12,8 @@ const Location = lazy(() => import('@/pages/Location'))
 const Contact = lazy(() => import('@/pages/Contact'))
 const Booking = lazy(() => import('@/pages/Booking'))
 const Legal = lazy(() => import('@/pages/Legal'))
+const JournalIndex = lazy(() => import('@/pages/Journal').then(m => ({ default: m.JournalIndex })))
+const JournalPost = lazy(() => import('@/pages/Journal').then(m => ({ default: m.JournalPost })))
 const NotFound = lazy(() => import('@/pages/NotFound'))
 const AdminApp = lazy(() => import('@/admin/AdminApp'))
 
@@ -43,6 +45,8 @@ function PublicSite() {
               <Route path="/location" element={<Location />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/booking" element={<Booking />} />
+              <Route path="/journal" element={<JournalIndex />} />
+              <Route path="/journal/:slug" element={<JournalPost />} />
               <Route path="/privacy" element={<Legal kind="privacy" />} />
               <Route path="/terms" element={<Legal kind="terms" />} />
               <Route path="*" element={<NotFound />} />
