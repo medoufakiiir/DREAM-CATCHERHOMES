@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 
 interface Testimonial {
   text: string
-  image: string
+  image?: string
   name: string
   role: string
 }
@@ -38,12 +38,12 @@ export function TestimonialsColumn({ testimonials, className, duration = 15 }: T
               "{t.text}"
             </p>
             <div className="flex items-center gap-3">
-              <img
-                src={t.image}
-                alt={t.name}
-                className="w-9 h-9 rounded-full object-cover ring-2 ring-gold/30"
-                loading="lazy"
-              />
+              <span
+                aria-hidden="true"
+                className="w-9 h-9 rounded-full bg-gold/15 ring-2 ring-gold/30 flex items-center justify-center font-heading text-sm font-semibold text-gold"
+              >
+                {t.name.charAt(0)}
+              </span>
               <div>
                 <p className="font-heading text-sm font-semibold text-ocean-500 dark:text-sand-100 leading-tight">
                   {t.name}

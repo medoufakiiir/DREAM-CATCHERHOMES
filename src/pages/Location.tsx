@@ -1,6 +1,8 @@
 import { motion } from 'motion/react'
 import { MapPin, Plane, Car, Navigation } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import Seo from '@/components/Seo'
+import PageHero from '@/components/PageHero'
 import { cn } from '@/lib/utils'
 
 const photos = Array.from({ length: 42 }, (_, i) => `/photo${String(i + 1).padStart(2, '0')}.jpg`)
@@ -33,18 +35,8 @@ export default function Location() {
 
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
-      {/* Hero */}
-      <div className="relative h-72 sm:h-96 overflow-hidden">
-        <img src={photos[5]} alt="Mirleft Morocco location" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ocean-900/30 to-ocean-900/80" />
-        <div className="absolute inset-0 flex items-end pb-12 justify-center text-center px-5">
-          <div className="text-white">
-            <p className="font-body text-xs uppercase tracking-widest text-gold mb-2">{tr.location.page_label}</p>
-            <h1 className="font-heading text-4xl sm:text-5xl font-bold">{tr.location.page_title}</h1>
-            <p className="font-body text-base mt-2 opacity-75">{tr.location.page_sub}</p>
-          </div>
-        </div>
-      </div>
+      <Seo title={tr.location.page_title} description={tr.location.page_sub} />
+      <PageHero image="/photo01.jpg" label={tr.location.page_label} title={tr.location.page_title} sub={tr.location.page_sub} />
 
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">

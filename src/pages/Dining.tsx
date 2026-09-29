@@ -1,6 +1,8 @@
 import { motion } from 'motion/react'
 import { Clock, Utensils, Leaf, Sun } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import Seo from '@/components/Seo'
+import PageHero from '@/components/PageHero'
 import { cn } from '@/lib/utils'
 
 const photos = Array.from({ length: 42 }, (_, i) => `/photo${String(i + 1).padStart(2, '0')}.jpg`)
@@ -39,8 +41,8 @@ export default function Dining() {
       desc: tr.dining.r1_desc,
       hours: tr.dining.r1_hours,
       mood: tr.dining.r1_mood,
-      accentPhoto: photos[13],
-      gridPhotos: [photos[18], photos[22], photos[27]],
+      accentPhoto: photos[32],
+      gridPhotos: [photos[33], photos[28], photos[15]],
       cuisines: ['Chinese', 'French', 'Mediterranean', 'Middle Eastern', 'Moroccan', 'Pizza', 'Seafood', 'BBQ'],
       highlight: null,
     },
@@ -51,8 +53,8 @@ export default function Dining() {
       desc: tr.dining.r2_desc,
       hours: tr.dining.r2_hours,
       mood: tr.dining.r2_mood,
-      accentPhoto: photos[19],
-      gridPhotos: [photos[24], photos[29], photos[33]],
+      accentPhoto: photos[10],
+      gridPhotos: [photos[0], photos[14], photos[25]],
       cuisines: ['American', 'French', 'Indian', 'Italian', 'Moroccan'],
       highlight: tr.dining.r2_breakfast,
     },
@@ -60,18 +62,8 @@ export default function Dining() {
 
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
-      {/* Hero */}
-      <div className="relative h-72 sm:h-96 overflow-hidden">
-        <img src={photos[13]} alt="Dining at DreamCatcher Homes" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ocean-900/30 to-ocean-900/85" />
-        <div className="absolute inset-0 flex items-end pb-12 justify-center text-center px-5">
-          <div className="text-white">
-            <p className="font-body text-xs uppercase tracking-widest text-gold mb-2">{tr.dining.page_label}</p>
-            <h1 className="font-heading text-4xl sm:text-5xl font-bold">{tr.dining.page_title}</h1>
-            <p className="font-body text-base mt-2 opacity-75">{tr.dining.page_sub}</p>
-          </div>
-        </div>
-      </div>
+      <Seo title={tr.dining.page_title} description={tr.dining.page_sub} />
+      <PageHero image="/photo11.jpg" label={tr.dining.page_label} title={tr.dining.page_title} sub={tr.dining.page_sub} />
 
       {/* Restaurants */}
       <section className="py-20">
@@ -164,7 +156,7 @@ export default function Dining() {
       <div className={`py-14 ${dark ? 'bg-ocean-800' : 'bg-sand-50'}`}>
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[photos[35], photos[37], photos[39], photos[41]].map((src, i) => (
+            {[photos[16], photos[29], photos[9], photos[35]].map((src, i) => (
               <Reveal key={i} delay={i * 0.07}>
                 <div className="rounded-xl overflow-hidden aspect-square">
                   <img src={src} alt="" loading="lazy" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />

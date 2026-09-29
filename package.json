@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/prerender.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
     "@tailwindcss/vite": "^4.3.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.3.19",

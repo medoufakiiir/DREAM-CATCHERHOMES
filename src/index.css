@@ -4,40 +4,49 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Typography */
-  --font-heading: 'Playfair Display', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  /* Typography — editorial serif + clean grotesk */
+  --font-heading: 'Cormorant Garamond', 'Cormorant', Georgia, serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
 
-  /* Ocean blues */
-  --color-ocean-50:  #e8f0f8;
-  --color-ocean-100: #b8cfe8;
-  --color-ocean-200: #88aed8;
-  --color-ocean-300: #588dc8;
-  --color-ocean-400: #2b6ca8;
-  --color-ocean-500: #1A3A5C;
-  --color-ocean-600: #152f4a;
-  --color-ocean-700: #102438;
-  --color-ocean-800: #0a1926;
-  --color-ocean-900: #0D1B2A;
+  /* Softer, more architectural corners */
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.625rem;
+  --radius-3xl: 0.875rem;
 
-  /* Sand */
-  --color-sand-50:  #fdf8f0;
-  --color-sand-100: #F5E6C8;
-  --color-sand-200: #ebd5a8;
-  --color-sand-300: #dfc088;
-  --color-sand-400: #d4a96a;
-  --color-sand-500: #c9924c;
+  /* "ocean" = ink scale (text + dark surfaces) */
+  --color-ocean-50:  #f1ede6;
+  --color-ocean-100: #d9d2c6;
+  --color-ocean-200: #b3a999;
+  --color-ocean-300: #8a8072;
+  --color-ocean-400: #5e574d;
+  --color-ocean-500: #221f1b;
+  --color-ocean-600: #1b1916;
+  --color-ocean-700: #2a2621;
+  --color-ocean-800: #1d1a17;
+  --color-ocean-900: #141210;
 
-  /* Gold */
-  --color-gold:     #C9A84C;
-  --color-gold-50:  #fdf8e8;
-  --color-gold-100: #f9edbc;
-  --color-gold-200: #f3d97c;
-  --color-gold-300: #ecc84e;
-  --color-gold-400: #d4a846;
-  --color-gold-500: #C9A84C;
-  --color-gold-600: #a88530;
-  --color-gold-700: #7a6020;
+  /* "sand" = bone / limestone surfaces */
+  --color-sand-50:  #f6f1e8;
+  --color-sand-100: #ebe3d5;
+  --color-sand-200: #ddd2bf;
+  --color-sand-300: #cbbda5;
+  --color-sand-400: #a8997f;
+  --color-sand-500: #8c7d63;
+
+  /* "gold" = Moroccan clay accent */
+  --color-gold:     #b0573a;
+  --color-gold-50:  #f8ece6;
+  --color-gold-100: #efd3c6;
+  --color-gold-200: #e0ac95;
+  --color-gold-300: #cf8466;
+  --color-gold-400: #bf6a4b;
+  --color-gold-500: #b0573a;
+  --color-gold-600: #94462c;
+  --color-gold-700: #733520;
+
+  /* Majorelle blue — used sparingly */
+  --color-majorelle: #2f4ea3;
 }
 
 @layer base {
@@ -57,18 +66,35 @@
   }
 
   ::selection {
-    background: #C9A84C33;
-    color: #1A3A5C;
+    background: #b0573a33;
+    color: #221f1b;
   }
+
+  h1, h2, h3 { font-weight: 500; letter-spacing: -0.01em; }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar        { width: 5px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: #C9A84C; border-radius: 10px; }
+::-webkit-scrollbar-thumb  { background: #b0573a; border-radius: 10px; }
 
 /* Image lazy load fade */
 img { transition: opacity 0.4s ease; }
 
 /* Remove default input date icon in some browsers */
 input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+
+/* Editorial helpers */
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+.grain::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+}
+@keyframes kenburns { from { transform: scale(1.08); } to { transform: scale(1); } }
+.kenburns { animation: kenburns 9s cubic-bezier(.22,1,.36,1) both; }
