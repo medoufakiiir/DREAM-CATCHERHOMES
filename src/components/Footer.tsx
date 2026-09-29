@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { MapPin, Phone, Mail, Instagram, Facebook } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 
 export default function Footer() {
   const { tr, dark } = useApp()
   const year = new Date().getFullYear()
+  const { pathname } = useLocation()
 
   const navLinks = [
     ['/villas', tr.nav.villas],
@@ -18,17 +19,19 @@ export default function Footer() {
 
   return (
     <footer className={dark ? 'bg-ocean-900 border-t border-white/5' : 'bg-ocean-500'}>
+      {pathname !== '/' && pathname !== '/booking' && <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-20 pb-14 border-b border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <p className="font-heading text-white text-4xl sm:text-6xl leading-[1.05] max-w-2xl">{tr.x.c_title}</p>
+        <Link to="/booking" className="shrink-0 inline-flex items-center justify-center bg-gold hover:bg-gold-600 text-white font-body text-[11px] uppercase tracking-[0.22em] font-semibold px-8 py-4 transition-colors">
+          {tr.home.cta_btn} →
+        </Link>
+      </div>}
       <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-16 pb-24 md:pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
 
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4 cursor-pointer">
-              <img src="/logo.png" alt="DreamCatcher Homes" className="h-11 w-auto object-contain brightness-0 invert" />
-              <div>
-                <p className="font-heading text-base font-semibold text-white leading-tight">DreamCatcher Homes</p>
-                <p className="font-body text-[10px] text-white/50 tracking-widest uppercase mt-0.5">Mirleft · Morocco</p>
-              </div>
+              <img src="/logo.png" alt="DreamCatcher Homes" className="h-16 w-auto object-contain brightness-0 invert" />
             </Link>
             <p className="font-body text-sm text-white/60 leading-relaxed mb-6">{tr.footer.tagline}</p>
             <div className="flex items-center gap-4">
@@ -53,7 +56,7 @@ export default function Footer() {
 
           {/* Quick links */}
           <div>
-            <h4 className="font-body text-xs uppercase tracking-widest text-white/40 mb-5">{tr.footer.links}</h4>
+            <h4 className="eyebrow text-white/40 mb-5">{tr.footer.links}</h4>
             <ul className="space-y-2.5">
               {navLinks.map(([path, label]) => (
                 <li key={path}>
@@ -65,7 +68,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-body text-xs uppercase tracking-widest text-white/40 mb-5">{tr.footer.contact}</h4>
+            <h4 className="eyebrow text-white/40 mb-5">{tr.footer.contact}</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-2.5 text-sm text-white/60 font-body">
                 <MapPin size={13} className="mt-0.5 shrink-0 text-gold" />
@@ -88,17 +91,11 @@ export default function Footer() {
 
           {/* Legal + booking CTA */}
           <div>
-            <h4 className="font-body text-xs uppercase tracking-widest text-white/40 mb-5">{tr.footer.legal}</h4>
+            <h4 className="eyebrow text-white/40 mb-5">{tr.footer.legal}</h4>
             <ul className="space-y-2.5 mb-6">
               <li><Link to="/privacy" className="font-body text-sm text-white/60 hover:text-white transition-colors cursor-pointer">{tr.footer.privacy}</Link></li>
               <li><Link to="/terms" className="font-body text-sm text-white/60 hover:text-white transition-colors cursor-pointer">{tr.footer.terms}</Link></li>
             </ul>
-            <Link
-              to="/booking"
-              className="inline-flex items-center bg-gold hover:bg-gold-600 text-white font-body text-sm font-medium px-5 py-2.5 rounded-full transition-colors cursor-pointer"
-            >
-              {tr.nav.book}
-            </Link>
           </div>
         </div>
 

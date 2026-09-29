@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 import { CheckCircle, Check, Minus, Plus, CalendarDays, Users, Moon, Mail, AlertCircle } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import Seo from '@/components/Seo'
+import PageHero from '@/components/PageHero'
 import { SITE, VILLAS, VillaId, waLink, isoDate, addDays, nightsBetween, photo } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
@@ -96,16 +97,7 @@ export default function Booking() {
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-sand-50'}>
       <Seo title={tr.booking.page_title} description={tr.booking.page_sub} />
-      {/* Hero */}
-      <div className="relative h-56 sm:h-64 overflow-hidden">
-        <img src="/photo04.jpg" alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-ocean-900/65" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-5 pt-10">
-          <p className="font-body text-xs uppercase tracking-widest text-gold mb-2">{tr.booking.page_label}</p>
-          <h1 className="font-heading text-4xl sm:text-5xl text-white font-bold">{tr.booking.page_title}</h1>
-          <p className="font-body text-sm text-white/70 mt-2">{tr.booking.page_sub}</p>
-        </div>
-      </div>
+      <PageHero image="/photo30.jpg" label={tr.booking.page_label} title={tr.booking.page_title} sub={tr.booking.page_sub} short />
 
       <section className="py-12 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-8">
@@ -248,7 +240,7 @@ export default function Booking() {
                   <button
                     type="submit"
                     disabled={datesInvalid}
-                    className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-body font-semibold py-4 rounded-xl transition-colors cursor-pointer text-sm"
+                    className="w-full flex items-center justify-center gap-2.5 bg-gold hover:bg-gold-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-body text-[11px] uppercase tracking-[0.18em] font-semibold py-4 transition-colors cursor-pointer"
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.558 4.114 1.528 5.836L0 24l6.335-1.51A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm5.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /></svg>
                     {tr.x.send_wa}

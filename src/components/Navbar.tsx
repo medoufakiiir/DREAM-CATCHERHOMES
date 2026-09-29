@@ -20,7 +20,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const { pathname } = useLocation()
-  const isHome = pathname === '/'
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60)
@@ -30,7 +29,7 @@ export default function Navbar() {
 
   useEffect(() => { setOpen(false) }, [pathname])
 
-  const transparent = isHome && !scrolled
+  const transparent = !scrolled && !open
 
   return (
     <>
@@ -50,26 +49,18 @@ export default function Navbar() {
             <img
               src="/logo.png"
               alt="DreamCatcher Homes"
-              className={cn('h-22 w-auto object-contain transition-all duration-300', transparent && 'brightness-0 invert')}
+              className={cn('h-14 sm:h-16 w-auto object-contain transition-all duration-300', transparent && 'brightness-0 invert')}
             />
-            <div className="hidden sm:block leading-tight">
-              <p className={cn('font-heading text-base font-semibold tracking-tight', transparent ? 'text-white' : dark ? 'text-sand-100' : 'text-ocean-500')}>
-                DreamCatcher Homes
-              </p>
-              <p className={cn('font-body text-[10px] tracking-widest uppercase', transparent ? 'text-white/60' : dark ? 'text-sand-300/60' : 'text-ocean-400/60')}>
-                Mirleft · Morocco
-              </p>
-            </div>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden xl:flex items-center gap-7">
+          <nav className="hidden xl:flex items-center gap-8">
             {links.map(({ key, path }) => (
               <Link
                 key={key}
                 to={path}
                 className={cn(
-                  'font-body text-sm transition-all duration-200 relative pb-0.5 cursor-pointer',
+                  'font-body text-[11px] uppercase tracking-[0.2em] transition-all duration-200 relative py-1 cursor-pointer',
                   transparent
                     ? 'text-white/80 hover:text-white'
                     : dark
@@ -124,7 +115,10 @@ export default function Navbar() {
 
             <Link
               to="/booking"
-              className="hidden sm:inline-flex items-center bg-gold hover:bg-gold-600 text-white font-body text-sm font-medium px-5 py-2.5 rounded-full transition-colors duration-200 cursor-pointer shadow-md shadow-gold/20"
+              className={cn(
+                'hidden sm:inline-flex items-center font-body text-[11px] uppercase tracking-[0.2em] font-semibold px-6 py-3 transition-colors duration-200 cursor-pointer',
+                transparent ? 'bg-white text-ocean-500 hover:bg-gold hover:text-white' : 'bg-gold text-white hover:bg-gold-600'
+              )}
             >
               {tr.nav.book}
             </Link>
@@ -162,7 +156,7 @@ export default function Navbar() {
                   key={key}
                   to={path}
                   className={cn(
-                    'font-heading text-2xl transition-colors cursor-pointer',
+                    'font-heading text-4xl transition-colors cursor-pointer',
                     pathname === path ? 'text-gold' : dark ? 'text-sand-100' : 'text-ocean-500'
                   )}
                 >
@@ -174,7 +168,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-3 mt-auto">
               <Link
                 to="/booking"
-                className="w-full text-center bg-gold hover:bg-gold-600 text-white font-body font-medium py-3.5 rounded-full transition-colors cursor-pointer"
+                className="w-full text-center bg-gold hover:bg-gold-600 text-white font-body text-xs uppercase tracking-[0.2em] font-semibold py-4 transition-colors cursor-pointer"
               >
                 {tr.nav.book}
               </Link>

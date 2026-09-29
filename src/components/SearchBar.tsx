@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { CalendarDays, Users, Search, Home as HomeIcon } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import { isoDate, addDays } from '@/lib/site'
-import { cn } from '@/lib/utils'
 
 export default function SearchBar() {
   const { tr } = useApp()
@@ -24,14 +23,14 @@ export default function SearchBar() {
     navigate(`/booking?${q}`)
   }
 
-  const cell = 'flex items-center gap-3 px-4 py-2.5 text-left min-w-0'
-  const label = 'block font-body text-[10px] uppercase tracking-widest text-ocean-300'
-  const input = 'w-full bg-transparent font-body text-sm text-ocean-500 outline-none cursor-pointer'
+  const cell = 'flex items-center gap-3 px-4 sm:px-5 py-3 text-left min-w-0'
+  const label = 'block font-body text-[10px] uppercase tracking-[0.2em] text-ocean-300 mb-0.5'
+  const input = 'w-full bg-transparent font-body text-sm font-medium text-ocean-500 outline-none cursor-pointer [color-scheme:light]'
 
   return (
     <form
       onSubmit={submit}
-      className="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-3xl md:rounded-full shadow-2xl shadow-black/30 p-2 grid grid-cols-2 md:grid-cols-[1fr_1fr_0.8fr_1fr_auto] items-center gap-y-1 md:divide-x divide-sand-100"
+      className="w-full bg-sand-50/95 backdrop-blur-md shadow-2xl shadow-black/30 p-1.5 grid grid-cols-2 md:grid-cols-[1fr_1fr_0.8fr_1fr_auto] items-center gap-y-1 md:divide-x divide-ocean-500/10"
     >
       <label className={cell}>
         <CalendarDays size={16} className="text-gold shrink-0" />
@@ -84,10 +83,10 @@ export default function SearchBar() {
           </select>
         </span>
       </label>
-      <div className={cn('col-span-2 md:col-span-1 md:pl-2 !border-0')}>
+      <div className="col-span-2 md:col-span-1 md:pl-1.5 h-full !border-0">
         <button
           type="submit"
-          className="w-full inline-flex items-center justify-center gap-2 bg-gold hover:bg-gold-600 text-white font-body text-sm font-medium px-6 py-3.5 rounded-full transition-colors cursor-pointer shadow-lg shadow-gold/30 whitespace-nowrap"
+          className="w-full h-full min-h-[56px] inline-flex items-center justify-center gap-2.5 bg-gold hover:bg-gold-600 text-white font-body text-[11px] uppercase tracking-[0.2em] font-semibold px-8 transition-colors cursor-pointer whitespace-nowrap"
         >
           <Search size={16} />
           {tr.x.search_btn}

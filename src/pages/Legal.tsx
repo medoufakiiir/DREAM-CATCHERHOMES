@@ -62,7 +62,7 @@ const TERMS: Section[] = [
     'Parties and events are not permitted without prior written consent',
     'Guests are expected to respect the property, neighbours, and local community',
     'Smoking is not permitted inside the villas',
-    'Pets are not permitted unless explicitly agreed in writing',
+    'Pets are welcome on request (charges may apply)',
   ] },
   { h: '5. Pool & Facilities', ul: [
     'Children under 12 must be supervised by an adult at the pool at all times',

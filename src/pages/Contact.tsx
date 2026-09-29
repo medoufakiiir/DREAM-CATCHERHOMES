@@ -3,7 +3,8 @@ import { motion } from 'motion/react'
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import Seo from '@/components/Seo'
-import { photos, SITE, waLink } from '@/lib/site'
+import PageHero from '@/components/PageHero'
+import { SITE, waLink } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
 function Reveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
@@ -61,18 +62,7 @@ export default function Contact() {
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
       <Seo title={tr.contact.page_title} description={tr.contact.page_sub} />
-      {/* Hero */}
-      <div className="relative h-64 sm:h-80 overflow-hidden">
-        <img src={photos[32]} alt="Contact DreamCatcher Homes" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ocean-900/30 to-ocean-900/80" />
-        <div className="absolute inset-0 flex items-end pb-12 justify-center text-center px-5">
-          <div className="text-white">
-            <p className="font-body text-xs uppercase tracking-widest text-gold mb-2">{tr.contact.page_label}</p>
-            <h1 className="font-heading text-4xl sm:text-5xl font-bold">{tr.contact.page_title}</h1>
-            <p className="font-body text-base mt-2 opacity-75">{tr.contact.page_sub}</p>
-          </div>
-        </div>
-      </div>
+      <PageHero image="/photo26.jpg" label={tr.contact.page_label} title={tr.contact.page_title} sub={tr.contact.page_sub} short />
 
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">

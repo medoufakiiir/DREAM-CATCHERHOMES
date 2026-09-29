@@ -17,8 +17,8 @@ export const photos = Array.from({ length: 42 }, (_, i) => photo(i + 1))
 export type VillaId = 'two-bedroom' | 'deluxe'
 
 export const VILLAS: { id: VillaId; maxGuests: number; photos: string[] }[] = [
-  { id: 'two-bedroom', maxGuests: 4, photos: [2, 6, 10, 3, 11, 15, 22, 27].map(photo) },
-  { id: 'deluxe', maxGuests: 4, photos: [8, 13, 18, 12, 19, 24, 29, 34].map(photo) },
+  { id: 'two-bedroom', maxGuests: 4, photos: [2, 22, 15, 5, 4, 6, 16, 25].map(photo) },
+  { id: 'deluxe', maxGuests: 4, photos: [13, 23, 33, 34, 18, 28, 26, 35].map(photo) },
 ]
 
 /** yyyy-mm-dd in local time */

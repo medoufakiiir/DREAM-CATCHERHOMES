@@ -1,169 +1,145 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bed, Bath, Users, Check, Star, Waves, Wifi, Car, ChevronRight, Images } from 'lucide-react'
+import { Bed, Check, Star, ArrowRight, Images } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import Reveal from '@/components/ui/Reveal'
 import Lightbox from '@/components/ui/Lightbox'
 import Seo from '@/components/Seo'
-import { photos, VILLAS, VillaId, waLink } from '@/lib/site'
+import PageHero from '@/components/PageHero'
+import { VILLAS, VillaId, waLink } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
 interface VillaProps {
   id: VillaId
+  index: number
   name: string
   badge: string
-  badgeColor: string
   desc: string
-  beds: { label: string }[]
-  delay: number
+  beds: string[]
 }
 
-function VillaCard({ id, name, badge, badgeColor, desc, beds, delay }: VillaProps) {
+function Villa({ id, index, name, badge, desc, beds }: VillaProps) {
   const { tr, dark, lang } = useApp()
   const [lb, setLb] = useState<number | null>(null)
   const vPhotos = VILLAS.find(v => v.id === id)!.photos
   const images = vPhotos.map((src, i) => ({ src, alt: `${name} — photo ${i + 1}` }))
-  const features = [tr.villas.pool, tr.villas.sea_view, tr.villas.kitchen, tr.villas.balcony]
+  const features = [
+    tr.villas.pool, tr.villas.sea_view, tr.villas.kitchen, tr.villas.balcony, tr.villas.wifi,
+    lang === 'fr' ? 'Parking gratuit' : 'Free parking',
+    lang === 'fr' ? 'TV écran plat & satellite' : 'Flat-screen TV & satellite',
+    lang === 'fr' ? '1 salle de bain' : '1 bathroom',
+  ]
+  const head = dark ? 'text-sand-100' : 'text-ocean-500'
+  const body = dark ? 'text-sand-300/80' : 'text-ocean-400'
+  const muted = dark ? 'text-sand-400' : 'text-ocean-300'
+  const rule = dark ? 'border-white/10' : 'border-ocean-500/15'
 
   return (
-    <Reveal delay={delay}>
+    <article id={id} className="scroll-mt-24">
       <Lightbox images={images} index={lb} onChange={setLb} />
-      <div id={id} className={cn('scroll-mt-28 rounded-3xl overflow-hidden shadow-xl', dark ? 'bg-ocean-800' : 'bg-white border border-sand-100')}>
-        {/* Photo grid */}
-        <div className="grid grid-cols-3 gap-1 h-72 md:h-96">
-          <div className="col-span-2 relative overflow-hidden group cursor-pointer" onClick={() => setLb(0)}>
-            <img src={vPhotos[0]} alt={name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+
+      {/* Photo mosaic */}
+      <Reveal>
+        <div className="relative grid grid-cols-4 grid-rows-2 gap-2 h-[320px] sm:h-[460px] lg:h-[560px]">
+          {vPhotos.slice(0, 5).map((src, i) => (
             <button
+              key={src}
               type="button"
-              onClick={e => { e.stopPropagation(); setLb(0) }}
-              className="absolute bottom-4 left-4 inline-flex items-center gap-2 bg-white/90 hover:bg-white text-ocean-500 font-body text-xs font-medium px-3.5 py-2 rounded-full shadow-lg cursor-pointer transition-colors"
+              onClick={() => setLb(i)}
+              className={cn('group overflow-hidden cursor-pointer', i === 0 ? 'col-span-4 sm:col-span-2 row-span-2' : 'hidden sm:block')}
+              aria-label={`${name} — photo ${i + 1}`}
             >
-              <Images size={14} /> {tr.x.view_photos} ({vPhotos.length})
+              <img src={src} alt="" loading={index === 0 && i === 0 ? 'eager' : 'lazy'} className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105" />
             </button>
-            <span className={`absolute top-4 left-4 text-xs font-semibold font-body px-3 py-1 rounded-full ${badgeColor}`}>
-              {badge}
-            </span>
+          ))}
+          <button
+            type="button"
+            onClick={() => setLb(0)}
+            className="absolute bottom-4 right-4 inline-flex items-center gap-2 bg-sand-50 hover:bg-white text-ocean-500 font-body text-[11px] uppercase tracking-[0.18em] font-semibold px-4 py-3 shadow-lg cursor-pointer transition-colors"
+          >
+            <Images size={14} /> {tr.x.view_photos} ({vPhotos.length})
+          </button>
+        </div>
+      </Reveal>
+
+      <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 mt-12">
+        {/* Info */}
+        <Reveal className="lg:col-span-7">
+          <div className="flex items-baseline gap-4">
+            <span className="font-heading italic text-gold text-2xl">0{index + 1}</span>
+            <span className={cn('eyebrow', muted)}>{badge}</span>
           </div>
-          <div className="grid grid-rows-2 gap-1">
-            {vPhotos.slice(1, 3).map((src, i) => (
-              <div key={i} className="overflow-hidden group cursor-pointer" onClick={() => setLb(i + 1)}>
-                <img src={src} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          <h2 className={cn('font-heading text-5xl sm:text-6xl mt-3 mb-4', head)}>{name}</h2>
+          <p className={cn('flex items-center gap-2 font-body text-sm mb-8', muted)}>
+            <Star size={13} fill="currentColor" className="text-gold" />
+            <b className={head}>9.3</b> · {tr.home.stats_beach} · Club Evasion
+          </p>
+          <p className={cn('font-body text-base leading-[1.85] mb-10', body)}>{desc}</p>
+
+          <dl className={cn('grid grid-cols-3 border-y py-6 mb-10', rule)}>
+            {[['4', tr.villas.guests], ['2', tr.villas.beds], ['120', tr.villas.sqm]].map(([n, l]) => (
+              <div key={l}>
+                <dd className={cn('font-heading text-4xl', head)}>{n}</dd>
+                <dt className={cn('eyebrow !tracking-[0.18em] mt-1', muted)}>{l}</dt>
               </div>
             ))}
-          </div>
-        </div>
+          </dl>
 
-        <div className="p-8 md:p-10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {/* Left: info */}
-            <div className="lg:col-span-2">
-              <div className="flex items-start justify-between flex-wrap gap-4 mb-5">
-                <div>
-                  <h2 className={`font-heading text-3xl font-bold mb-1 ${dark ? 'text-sand-100' : 'text-ocean-500'}`}>{name}</h2>
-                  <div className="flex items-center gap-1.5 text-gold font-body text-sm">
-                    <Waves size={13} />
-                    <span>{tr.home.stats_beach} · Club Evasion Resort</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 bg-gold/10 px-3 py-1.5 rounded-full">
-                  <Star size={13} fill="#C9A84C" className="text-gold" />
-                  <span className="font-body text-sm font-bold text-gold">9.3</span>
-                  <span className={`font-body text-xs ${dark ? 'text-sand-300' : 'text-ocean-300'}`}>Superb</span>
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="flex flex-wrap gap-3 mb-6">
-                {[
-                  { icon: Users, val: `4 ${tr.villas.guests}` },
-                  { icon: Bed, val: `2 ${tr.villas.beds}` },
-                  { icon: Bath, val: lang === 'fr' ? '1 salle de bain' : '1 bathroom' },
-                  { icon: Waves, val: `120 ${tr.villas.sqm}` },
-                ].map(({ icon: Icon, val }) => (
-                  <span key={val} className={cn('flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-body text-sm', dark ? 'bg-ocean-700 text-sand-200' : 'bg-sand-50 text-ocean-500')}>
-                    <Icon size={13} className="text-gold" />
-                    {val}
-                  </span>
-                ))}
-              </div>
-
-              <p className={`font-body text-base leading-relaxed mb-7 ${dark ? 'text-sand-300/80' : 'text-ocean-400'}`}>{desc}</p>
-
-              {/* Beds */}
-              <div className="mb-7">
-                <h4 className={`font-heading text-sm uppercase tracking-widest mb-3 ${dark ? 'text-sand-400' : 'text-ocean-300'}`}>{lang === 'fr' ? 'Couchages' : 'Sleeping arrangements'}</h4>
-                <div className="space-y-2">
-                  {beds.map(({ label }) => (
-                    <div key={label} className="flex items-center gap-2">
-                      <Bed size={14} className="text-gold shrink-0" />
-                      <span className={`font-body text-sm ${dark ? 'text-sand-200' : 'text-ocean-400'}`}>{label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Features */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {features.map(f => (
-                  <div key={f} className="flex items-center gap-2">
-                    <Check size={13} className="text-gold shrink-0" />
-                    <span className={`font-body text-sm ${dark ? 'text-sand-200' : 'text-ocean-400'}`}>{f}</span>
-                  </div>
-                ))}
-                <div className="flex items-center gap-2">
-                  <Wifi size={13} className="text-gold shrink-0" />
-                  <span className={`font-body text-sm ${dark ? 'text-sand-200' : 'text-ocean-400'}`}>{tr.villas.wifi}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Car size={13} className="text-gold shrink-0" />
-                  <span className={`font-body text-sm ${dark ? 'text-sand-200' : 'text-ocean-400'}`}>{lang === 'fr' ? 'Parking gratuit' : 'Free parking'}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: pricing widget */}
+          <div className="grid sm:grid-cols-2 gap-10">
             <div>
-              <div className={cn('rounded-2xl p-6 sticky top-24', dark ? 'bg-ocean-700' : 'bg-sand-50')}>
-
-                <div className={cn('space-y-2 text-xs font-body mb-6 pb-5 border-b', dark ? 'text-sand-300 border-white/10' : 'text-ocean-400 border-sand-200')}>
-                  {[
-                    { icon: Check, text: tr.villas.free_cancel },
-                    { icon: Check, text: tr.villas.no_prepay },
-                    { icon: Check, text: tr.villas.pay_property },
-                    { icon: Check, text: tr.villas.checkin },
-                    { icon: Check, text: tr.villas.checkout },
-                  ].map(({ icon: Icon, text }) => (
-                    <p key={text} className="flex items-center gap-1.5">
-                      <Icon size={11} className="text-green-500 shrink-0" />
-                      {text}
-                    </p>
-                  ))}
-                </div>
-
-                <p className={`font-body text-xs text-center mb-3 ${dark ? 'text-sand-400' : 'text-ocean-300'}`}>{tr.villas.payment}</p>
-
-                <div className="space-y-2">
-                  <Link
-                    to={`/booking?villa=${id}`}
-                    className="w-full flex justify-center items-center gap-1.5 bg-gold hover:bg-gold-600 text-white font-body text-sm font-medium py-3.5 rounded-xl transition-colors cursor-pointer"
-                  >
-                    {tr.villas.book_btn} <ChevronRight size={14} />
-                  </Link>
-                  <a
-                    href={waLink(`Hello, I'm interested in the ${name} at DreamCatcher Homes.`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn('w-full flex justify-center items-center gap-1.5 font-body text-sm py-3.5 rounded-xl border transition-colors cursor-pointer', dark ? 'border-white/10 text-sand-200 hover:border-gold/50' : 'border-sand-200 text-ocean-500 hover:border-gold')}
-                  >
-                    {tr.villas.wa_btn}
-                  </a>
-                </div>
-              </div>
+              <h3 className={cn('eyebrow mb-4', muted)}>{lang === 'fr' ? 'Couchages' : 'Sleeping arrangements'}</h3>
+              <ul className="space-y-3">
+                {beds.map(b => (
+                  <li key={b} className={cn('flex items-start gap-3 font-body text-sm', body)}>
+                    <Bed size={15} className="text-gold shrink-0 mt-0.5" /> {b}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className={cn('eyebrow mb-4', muted)}>{lang === 'fr' ? 'Dans la villa' : 'In the villa'}</h3>
+              <ul className="space-y-3">
+                {features.map(f => (
+                  <li key={f} className={cn('flex items-center gap-3 font-body text-sm', body)}>
+                    <Check size={14} className="text-gold shrink-0" /> {f}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        </div>
+        </Reveal>
+
+        {/* Booking card */}
+        <aside className="lg:col-span-5 lg:self-start lg:sticky lg:top-28">
+          <Reveal delay={0.1}>
+            <div className={cn('p-8', dark ? 'bg-ocean-800' : 'bg-sand-50')}>
+              <p className={cn('eyebrow mb-2', muted)}>{tr.x.your_stay}</p>
+              <p className={cn('font-heading text-3xl mb-6', head)}>{name}</p>
+              <ul className={cn('space-y-2.5 font-body text-sm border-t pt-6 mb-8', body, rule)}>
+                {[tr.villas.free_cancel, tr.villas.no_prepay, tr.villas.pay_property, tr.villas.checkin, tr.villas.checkout].map(t => (
+                  <li key={t} className="flex items-center gap-3"><Check size={14} className="text-gold shrink-0" /> {t}</li>
+                ))}
+              </ul>
+              <Link
+                to={`/booking?villa=${id}`}
+                className="w-full inline-flex items-center justify-center gap-3 bg-gold hover:bg-gold-600 text-white font-body text-[11px] uppercase tracking-[0.22em] font-semibold py-4 transition-colors"
+              >
+                {tr.villas.book_btn} <ArrowRight size={14} />
+              </Link>
+              <a
+                href={waLink(`Hello, I'm interested in the ${name} at DreamCatcher Homes.`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn('w-full mt-3 inline-flex items-center justify-center font-body text-[11px] uppercase tracking-[0.22em] font-semibold py-4 border transition-colors', dark ? 'border-white/15 text-sand-100 hover:border-gold' : 'border-ocean-500/20 text-ocean-500 hover:border-gold hover:text-gold')}
+              >
+                {tr.villas.wa_btn}
+              </a>
+              <p className={cn('font-body text-xs text-center mt-5', muted)}>{tr.villas.payment}</p>
+            </div>
+          </Reveal>
+        </aside>
       </div>
-    </Reveal>
+    </article>
   )
 }
 
@@ -173,38 +149,25 @@ export default function Villas() {
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
       <Seo title={tr.villas.page_title} description={tr.villas.page_sub} />
-      {/* Hero */}
-      <div className="relative h-64 sm:h-80 overflow-hidden">
-        <img src={photos[0]} alt="DreamCatcher Homes villas" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ocean-900/30 to-ocean-900/80" />
-        <div className="absolute inset-0 flex items-end pb-12 justify-center text-center px-5">
-          <div className="text-white">
-            <p className="font-body text-xs uppercase tracking-widest text-gold mb-2">{tr.villas.page_label}</p>
-            <h1 className="font-heading text-4xl sm:text-5xl font-bold">{tr.villas.page_title}</h1>
-            <p className="font-body text-base mt-2 opacity-75">{tr.villas.page_sub}</p>
-          </div>
-        </div>
-      </div>
+      <PageHero image="/photo15.jpg" label={tr.villas.page_label} title={tr.villas.page_title} sub={tr.villas.page_sub} />
 
-      <section className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-14">
-          <VillaCard
+      <section className="py-20 md:py-28">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-28 md:space-y-40">
+          <Villa
             id="two-bedroom"
+            index={0}
             name={tr.villas.v1_name}
             badge={tr.villas.v1_badge}
-            badgeColor="bg-gold text-white"
             desc={tr.villas.v1_desc}
-            beds={[{ label: tr.villas.v1_bed1 }, { label: tr.villas.v1_bed2 }, { label: tr.villas.v1_living }]}
-            delay={0}
+            beds={[tr.villas.v1_bed1, tr.villas.v1_bed2, tr.villas.v1_living]}
           />
-          <VillaCard
+          <Villa
             id="deluxe"
+            index={1}
             name={tr.villas.v2_name}
             badge={tr.villas.v2_badge}
-            badgeColor="bg-ocean-500 text-white"
             desc={tr.villas.v2_desc}
-            beds={[{ label: tr.villas.v2_bed1 }, { label: tr.villas.v2_bed2 }]}
-            delay={0.1}
+            beds={[tr.villas.v2_bed1, tr.villas.v2_bed2]}
           />
         </div>
       </section>

@@ -39,7 +39,7 @@ export default function MobileBookBar() {
           </div>
           <Link
             to="/booking"
-            className="shrink-0 inline-flex items-center gap-1.5 bg-gold hover:bg-gold-600 text-white font-body text-sm font-medium px-5 py-3 rounded-full transition-colors"
+            className="shrink-0 inline-flex items-center gap-2 bg-gold hover:bg-gold-600 text-white font-body text-[11px] uppercase tracking-[0.18em] font-semibold px-5 py-3.5 transition-colors"
           >
             <CalendarDays size={15} /> {tr.x.mobile_book}
           </Link>

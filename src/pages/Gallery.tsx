@@ -4,6 +4,7 @@ import { ZoomIn } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import Lightbox from '@/components/ui/Lightbox'
 import Seo from '@/components/Seo'
+import PageHero from '@/components/PageHero'
 
 const allPhotos = Array.from({ length: 42 }, (_, i) => ({
   src: `/photo${String(i + 1).padStart(2, '0')}.jpg`,
@@ -20,18 +21,7 @@ export default function Gallery() {
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
       <Seo title={tr.gallery.page_title} description={tr.gallery.page_sub} />
-      {/* Hero */}
-      <div className="relative h-64 sm:h-80 overflow-hidden">
-        <img src="/photo01.jpg" alt="Gallery" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ocean-900/30 to-ocean-900/80" />
-        <div className="absolute inset-0 flex items-end pb-12 justify-center text-center px-5">
-          <div className="text-white">
-            <p className="font-body text-xs uppercase tracking-widest text-gold mb-2">{tr.gallery.page_label}</p>
-            <h1 className="font-heading text-4xl sm:text-5xl font-bold">{tr.gallery.page_title}</h1>
-            <p className="font-body text-sm mt-2 opacity-60">{tr.gallery.page_sub}</p>
-          </div>
-        </div>
-      </div>
+      <PageHero image="/photo17.jpg" label={tr.gallery.page_label} title={tr.gallery.page_title} sub={tr.gallery.page_sub} />
 
       {/* Masonry grid */}
       <section className="py-10">

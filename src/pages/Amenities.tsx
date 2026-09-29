@@ -2,9 +2,9 @@ import { motion } from 'motion/react'
 import { Waves, Wifi, Car, Utensils, TreePalm, Coffee, Tv, Bike, Plane, PawPrint, Accessibility, Users, Flame, Shield, Baby, CreditCard, Clock, MapPin, Mountain, Dumbbell, BedDouble, Bath, ChefHat, Wind } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import Seo from '@/components/Seo'
+import PageHero from '@/components/PageHero'
 import { cn } from '@/lib/utils'
 
-const photos = Array.from({ length: 42 }, (_, i) => `/photo${String(i + 1).padStart(2, '0')}.jpg`)
 
 function Reveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   return (
@@ -112,49 +112,32 @@ export default function Amenities() {
   return (
     <div className={dark ? 'bg-ocean-900' : 'bg-white'}>
       <Seo title={tr.amenities.page_title} description={tr.amenities.page_sub} />
-      {/* Hero */}
-      <div className="relative h-64 sm:h-80 overflow-hidden">
-        <img src={photos[15]} alt="DreamCatcher Homes amenities" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ocean-900/30 to-ocean-900/80" />
-        <div className="absolute inset-0 flex items-end pb-12 justify-center text-center px-5">
-          <div className="text-white">
-            <p className="font-body text-xs uppercase tracking-widest text-gold mb-2">{tr.amenities.page_label}</p>
-            <h1 className="font-heading text-4xl sm:text-5xl font-bold">{tr.amenities.page_title}</h1>
-            <p className="font-body text-base mt-2 opacity-75">{tr.amenities.page_sub}</p>
-          </div>
-        </div>
-      </div>
+      <PageHero image="/photo14.jpg" label={tr.amenities.page_label} title={tr.amenities.page_title} sub={tr.amenities.page_sub} />
 
       {/* Photo strip */}
-      <div className="grid grid-cols-4 h-28 overflow-hidden">
-        {[photos[28], photos[31], photos[34], photos[38]].map((src, i) => (
-          <img key={i} src={src} alt="" loading="lazy" className="w-full h-full object-cover" />
-        ))}
-      </div>
 
       {/* Grid */}
-      <section className="py-20">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-14">
             {categories.map((cat, ci) => {
               const HeadIcon = cat.icon
               return (
                 <Reveal key={cat.key} delay={ci * 0.08}>
-                  <div className={cn('rounded-2xl overflow-hidden h-full', dark ? 'bg-ocean-800' : 'bg-white border border-sand-100 shadow-sm')}>
-                    <div className={`h-1.5 w-full bg-gradient-to-r ${cat.color}`} />
-                    <div className="p-6">
+                  <div className={cn('h-full border-t pt-7', dark ? 'border-white/15' : 'border-ocean-500/20')}>
+                    <div>
                       <div className="flex items-center gap-2.5 mb-5">
-                        <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center">
-                          <HeadIcon size={15} className="text-gold" />
+                        <div className="flex items-center justify-center">
+                          <HeadIcon size={18} className="text-gold" />
                         </div>
-                        <h2 className={`font-heading text-base font-semibold ${dark ? 'text-sand-100' : 'text-ocean-500'}`}>
+                        <h2 className={`font-heading text-2xl ${dark ? 'text-sand-100' : 'text-ocean-500'}`}>
                           {categoryLabels[cat.key]}
                         </h2>
                       </div>
                       <ul className="space-y-2.5">
                         {cat.items.map((item, i) => (
                           <li key={i} className="flex items-center gap-2.5">
-                            <div className="w-6 h-6 rounded-full bg-gold/8 flex items-center justify-center shrink-0">
+                            <div className="w-5 flex items-center justify-center shrink-0">
                               <item.icon size={11} className="text-gold" />
                             </div>
                             <span className={`font-body text-sm ${dark ? 'text-sand-200' : 'text-ocean-400'}`}>
